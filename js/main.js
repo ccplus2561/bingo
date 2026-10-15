@@ -12,6 +12,7 @@ import { initEffects } from './ui/effects.js';
 import { initRulesView } from './ui/rules-view.js';
 import { openReceipt } from './ui/receipt-view.js';
 import { el } from './utils/dom.js';
+import { createDeskBrand } from './ui/more-menu.js';
 
 const STATUS_TEXT = { setup: '設定中', playing: '遊戲進行中', ended: '已結束' };
 
@@ -29,6 +30,7 @@ function start() {
   initSettings(document.getElementById('settings-root'));
   initEffects({ soundBtn: document.getElementById('sound-btn'), ttsBtn: document.getElementById('tts-btn') });
 
+  document.querySelectorAll('.desk-slot').forEach((slot) => slot.replaceChildren(createDeskBrand()));
   initRulesView(document.getElementById('rules-btn'));
   const receiptBtn = document.getElementById('receipt-btn');
   receiptBtn.addEventListener('click', openReceipt);

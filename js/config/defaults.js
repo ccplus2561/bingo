@@ -45,8 +45,8 @@ export const LAYOUTS = ['mobile', 'desktop']; // 只提供手機版／電腦版�
 // 抽號暗控參數（單一來源，可自行調整）
 export const DRAW_RULES = {
   maxInvalidStreak: 4, // 最多連續 4 次無效，第 5 次必定為新有效號
-  baseInvalidRate: 0.15, // 壓力 0 時的無效號（repeat/blank）出現率
-  boostedInvalidRate: 0.6, // 壓力 1 時的無效號出現率
+  baseInvalidRate: 0.25, // 壓力 0 時的無效號（repeat/blank）出現率
+  boostedInvalidRate: 0.7, // 壓力 1 時的無效號出現率
   repeatShare: 0.5, // 兩個開關皆開時，無效號中 repeat 所占比例（其餘為 blank）
   defaultPressure: 0.5, // 階段 3 接上財務壓力前的預設壓力值（0~1）
 };

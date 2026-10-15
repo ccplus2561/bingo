@@ -126,20 +126,10 @@ export function initDrawView(root) {
       ...Array.from({ length: total }, () => el('div', { class: 'chip is-empty', role: 'listitem' })));
     grid.style.setProperty('--n', String(total));
     const summary = el('p', { class: 'batch-summary', 'aria-live': 'polite' }, `連抽 ${total} 次，抽號中…`);
-    const modal = showModal({ title: `🎰 連抽 ${total} 次`, content: el('div', { class: 'batch-modal' }, grid, summary), actions: [{ text: '確定', kind: 'primary' }], onClose: () => { if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {}); } });
+    const modal = showModal({ title: `🎰 連抽 ${total} 次`, content: el('div', { class: 'batch-modal' }, grid, summary), actions: [{ text: '確定', kind: 'primary' }] });
     const overlay = grid.closest('.modal-overlay');
     overlay.classList.add('batch-overlay');
     overlay.querySelector('.modal').classList.add('modal-batch');
-    const fsBtn = el('button', { type: 'button', class: 'batch-fs', 'aria-pressed': 'false', onClick: () => {
-      const on = overlay.classList.toggle('is-full');
-      fsBtn.textContent = on ? '🗗 還原' : '⛶ 全螢幕';
-      fsBtn.setAttribute('aria-pressed', String(on));
-      try { // 盡量進入瀏覽器真正的全螢幕；不支援時仍有鋪滿視窗的效果
-        if (on && overlay.requestFullscreen) overlay.requestFullscreen().catch(() => {});
-        else if (!on && document.fullscreenElement) document.exitFullscreen().catch(() => {});
-      } catch { /* 忽略 */ }
-    } }, '⛶ 全螢幕');
-    overlay.querySelector('.modal').append(fsBtn);
     const okBtn = overlay.querySelector('.modal-actions .btn');
     if (okBtn) okBtn.disabled = true;
 
