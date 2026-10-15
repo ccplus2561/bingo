@@ -1,6 +1,6 @@
 // 電腦版：標題列移除後，在獎金池上方顯示「兵果彩盤」＋「更多」按鈕；
 // 更多選單依序：規則、驗卡、音效、語音、設定、結束遊戲（結束遊戲有確認視窗，見 endGameFlow）。
-import { getState } from '../core/state.js';
+import { getState, setState } from '../core/state.js';
 import { el, showModal } from '../utils/dom.js';
 import { endGameFlow, openReceipt } from './receipt-view.js';
 import { openCheckModal } from './draw-view.js';
@@ -55,9 +55,10 @@ function openMoreMenu() {
 }
 
 /** 建立「兵果彩盤＋更多」列（電腦版專用，手機版以 CSS 隱藏） */
-export function createDeskBrand() {
+export function createDeskBrand({ back = false } = {}) {
   return el('div', { class: 'desk-brand' },
     el('span', { class: 'desk-brand-title' }, '🧧 兵果彩盤'),
     el('span', { class: 'status-badge', dataset: { status: 'setup' } }, '設定中'),
+    back ? el('button', { type: 'button', class: 'btn btn-gold desk-back', onClick: () => setState({ ui: { tab: 'draw' } }) }, '← 返回抽號') : null,
     el('button', { type: 'button', class: 'btn btn-primary desk-more', onClick: openMoreMenu, 'aria-haspopup': 'dialog' }, '☰ 更多'));
 }

@@ -75,3 +75,7 @@ body { overflow: hidden; display: flex; flex-direction: column; }
 .desk-more { flex: none; white-space: nowrap; }
 .desk-brand-title { font-size: clamp(1.25rem, 3vh, 1.75rem); letter-spacing: .03em; }
 .desk-brand { gap: 8px; }
+
+/* 設定頁：返回抽號（靠右，在「更多」左邊） */
+.desk-back { margin-left: auto; flex: none; white-space: nowrap; min-height: clamp(40px, 5.4vh, 52px); padding: 0 18px; font-size: clamp(1rem, 2.1vh, 1.2rem); }
+.desk-back + .desk-more { margin-left: 0; }
