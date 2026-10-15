@@ -1,4 +1,4 @@
-// 抽號卡（階段 5）：大號碼＋抽號／連抽／撤回／名次登錄／結束遊戲＋最新 5 次走馬燈。
+// 抽號卡：大號碼＋連抽（1～5 次，結果以懸浮視窗顯示）／撤回／名次登錄／結束遊戲＋最新 5 次走馬燈。
 // DOM 只建立一次，之後由 state.subscribe 驅動更新（按鈕不會被重建，鍵盤焦點與遙控器操作不中斷）。
 import { getState, setState, subscribe } from '../core/state.js';
 import { drawOne, drawnNumbers, appendRecords } from '../core/draw-engine.js';
@@ -62,14 +62,8 @@ export function initDrawView(root) {
   // 空狀態：尚未開始時，直接提供前往設定頁的按鈕
   const gotoSettings = el('button', { type: 'button', class: 'btn btn-primary btn-block btn-goto', onClick: () => setState({ ui: { tab: 'settings' } }) }, '⚙️ 前往設定並開始遊戲');
 
-  // ---- 抽號按鈕 ----
-  const freeBtn = el('button', { type: 'button', class: 'btn btn-primary btn-xl', onClick: () => run(() => drawOne(getState(), { paid: false })) }, '🎲 抽號（免費）');
-  const paidPriceTag = el('small', { class: 'btn-sub' });
-  const paidBtn = el('button', { type: 'button', class: 'btn btn-gold btn-xl', onClick: () => run(() => paidDraw(getState(), 1)) },
-    el('span', {}, '💰 付費單抽（1 次）'), paidPriceTag);
-
   // ---- 連抽 ----
-  const stepper = createStepper({ min: 1, max: 10, value: 3, label: '連抽次數', onChange: () => update() });
+  const stepper = createStepper({ min: 1, max: 5, value: 1, label: '連抽次數', onChange: () => update() });
   const batchSub = el('small', { class: 'btn-sub' });
   const batchLabel = el('span', {});
   const batchBtn = el('button', { type: 'button', class: 'btn btn-gold btn-batch', onClick: onBatch }, batchLabel, batchSub);
@@ -89,7 +83,6 @@ export function initDrawView(root) {
       stage,
       caption,
       gotoSettings,
-      el('div', { class: 'draw-actions' }, freeBtn, paidBtn),
       el('div', { class: 'batch-row' }, stepper.node, batchBtn),
       el('div', { class: 'draw-tools' }, undoBtn, rankBtn, checkBtn, endBtn),
       hint,
@@ -113,7 +106,17 @@ export function initDrawView(root) {
     apply(action());
   }
 
-  /** 連抽：先一次算出結果，再每 0.8 秒套用一筆（每一步的 state 都一致，彩池逐筆增加） */
+  /** 一筆抽號結果的小卡（連抽視窗用） */
+  function resultChip(record, isLast) {
+    return el('div', { class: `chip chip-${record.type} is-fresh${isLast ? ' is-newest' : ''}`, role: 'listitem' },
+      el('span', { class: 'chip-num' }, record.type === 'blank' ? '🙏' : `${bingoLetter(record.number)}${record.number}`),
+      el('span', { class: 'chip-tag' }, KIND[record.type].tag));
+  }
+
+  /**
+   * 連抽：先一次算出結果，再每 0.8 秒套用一筆（每一步的 state 都一致，彩池逐筆增加）。
+   * 同時開啟懸浮視窗，逐筆顯示本次所有抽出內容；抽完後按「確定」關閉，次數恢復為 1。
+   */
   async function onBatch() {
     if (busy) return;
     const result = paidDraw(getState(), stepper.get());
@@ -123,20 +126,43 @@ export function initDrawView(root) {
     }
     busy = true;
     update();
+
+    const total = result.records.length;
+    const price = getState().settings.drawPrice;
+    const grid = el('div', { class: 'batch-results', role: 'list', 'aria-label': '本次連抽結果' },
+      ...Array.from({ length: total }, () => el('div', { class: 'chip is-empty', role: 'listitem' })));
+    const summary = el('p', { class: 'batch-summary', 'aria-live': 'polite' }, `連抽 ${total} 次，抽號中…`);
+    const modal = showModal({ title: `🎰 連抽 ${total} 次`, content: el('div', { class: 'batch-modal' }, grid, summary), actions: [{ text: '確定', kind: 'primary' }], wide: true });
+    const okBtn = grid.closest('.modal-overlay')?.querySelector('.modal-actions .btn');
+    if (okBtn) okBtn.disabled = true;
+
     const startLen = getState().game.history.length;
+    let shown = 0;
     try {
-      for (let i = 0; i < result.records.length; i++) {
+      for (let i = 0; i < total; i++) {
         if (i > 0) await sleep(BATCH_PLAY_INTERVAL_MS);
         const { game } = getState();
         // 播放期間若局面被改動（例如在設定頁重新開始），就中止，避免寫入錯誤的紀錄
         if (game.status !== 'playing' || game.history.length !== startLen + i) break;
         setState({ game: appendRecords(game, [result.records[i]]) });
+        grid.children[i].replaceWith(resultChip(result.records[i], i === total - 1));
+        shown = i + 1;
       }
     } finally {
       busy = false;
+      stepper.set(1); // 每次連抽結束，次數恢復為 1
       update();
     }
+
+    const shownRecords = result.records.slice(0, shown);
+    const count = (type) => shownRecords.filter((r) => r.type === type).length;
+    const parts = [`共 ${shown} 次・${formatMoney(shown * price)}`, `新號 ${count('new')}`];
+    if (count('repeat')) parts.push(`重複 ${count('repeat')}`);
+    if (count('blank')) parts.push(`銘謝惠顧 ${count('blank')}`);
+    summary.textContent = parts.join('・');
+    if (okBtn) { okBtn.disabled = false; okBtn.focus(); }
     if (result.drawn < result.requested) toast(`號碼已抽完，實際抽出 ${result.drawn} 次`);
+    return modal;
   }
 
   async function onUndo() {
@@ -245,8 +271,7 @@ export function initDrawView(root) {
       role: 'listitem',
     },
       el('span', { class: 'chip-num' }, isBlank ? '🙏' : `${bingoLetter(record.number)}${record.number}`),
-      el('span', { class: 'chip-tag' }, KIND[record.type].tag),
-      record.paid ? el('span', { class: 'chip-paid' }, '付費') : null
+      el('span', { class: 'chip-tag' }, KIND[record.type].tag)
     );
   }
 
@@ -269,10 +294,7 @@ export function initDrawView(root) {
     const allDrawn = drawnNumbers(history).size >= NUMBER_MAX;
     const canDraw = playing && !allDrawn && !busy;
 
-    // 抽號與連抽
-    freeBtn.disabled = !canDraw;
-    paidBtn.disabled = !canDraw;
-    paidPriceTag.textContent = formatMoney(settings.drawPrice);
+    // 連抽
     const maxCount = maxBatchCount(settings);
     stepper.setBounds(1, maxCount);
     const n = stepper.get();

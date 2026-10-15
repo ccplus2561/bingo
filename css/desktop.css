@@ -45,8 +45,6 @@ html[data-layout="desktop"] .prize-card { height: 100%; margin-bottom: 0; }
 html[data-layout="desktop"] .ball-caption-xl { font-size: clamp(1.1rem, 3.2vh, 2rem); }
 html[data-layout="desktop"] .draw-panel { gap: 8px; padding: 12px 16px; }
 html[data-layout="desktop"] .stage { flex: 1 1 0; height: auto; min-height: 0; }
-html[data-layout="desktop"] .draw-actions { grid-template-columns: 1fr 1fr; }
-html[data-layout="desktop"] .btn-xl { min-height: clamp(50px, 7vh, 88px); font-size: clamp(1.05rem, 2.4vh, 1.8rem); }
 html[data-layout="desktop"] .batch-row .stepper button { min-height: clamp(40px, 5.8vh, 56px); }
 html[data-layout="desktop"] .stepper-value { font-size: clamp(1.2rem, 2.8vh, 1.8rem); }
 html[data-layout="desktop"] .btn-batch { min-height: clamp(44px, 6vh, 62px); font-size: clamp(1rem, 2.2vh, 1.4rem); }
@@ -58,9 +56,8 @@ html[data-layout="desktop"] .draw-hint { min-height: 0; }
 html[data-layout="desktop"] .chip { min-height: clamp(56px, 8vh, 100px); }
 html[data-layout="desktop"] .ticker-title { margin-bottom: 2px; }
 html[data-layout="desktop"] .chip-tag { font-size: clamp(.8rem, 1.9vh, 1.15rem); }
-html[data-layout="desktop"] .chip-paid { font-size: clamp(.76rem, 1.7vh, 1rem); }
 html[data-layout="desktop"] .btn-goto { min-height: clamp(40px, 5.5vh, 56px); }
-html[data-layout="desktop"] .hdr-btn, html[data-layout="desktop"] .layout-btn { min-height: 44px; font-size: var(--fs-md); }
+html[data-layout="desktop"] .hdr-btn { min-height: 44px; font-size: var(--fs-md); }
 
 /* 左欄：獎金池，字級與列高隨視窗高度縮放，維持免滾動 */
 html[data-layout="desktop"] .prize-card { display: flex; flex-direction: column; padding: 12px 16px; overflow: hidden; }

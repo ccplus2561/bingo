@@ -212,11 +212,6 @@
 .ball-caption-xl[data-kind="repeat"] { color: #fff; background: var(--teal-700); }
 .ball-caption-xl[data-kind="blank"] { color: #f6e7cf; background: var(--brown-700); }
 
-.draw-actions { display: grid; grid-template-columns: 1fr; gap: 10px; }
-.btn-xl {
-  flex-direction: column; gap: 0; line-height: 1.25;
-  min-height: 72px; font-size: 1.35rem; padding: 6px 12px;
-}
 .btn-gold { background: linear-gradient(var(--gold-300), var(--gold-500)); color: var(--red-900); border-color: #b57d10; }
 .btn-sub { font-size: .8rem; font-weight: 600; opacity: .85; }
 .draw-hint { min-height: 1.6em; text-align: center; font-weight: 700; color: var(--muted); }
@@ -232,7 +227,6 @@
 }
 .chip-num { font-family: var(--font-brand); font-weight: 900; font-size: clamp(1.25rem, 3.4vh, 2.6rem); line-height: 1.1; color: var(--red-900); font-variant-numeric: tabular-nums; }
 .chip-tag { font-size: .8rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
-.chip-paid { font-size: .76rem; font-weight: 700; padding: 0 6px; border-radius: 999px; background: var(--gold-300); color: var(--red-900); }
 .chip-new { background: var(--gold-100); border-color: var(--gold-500); }
 .chip-repeat { background: #e3f1f3; border-color: var(--teal-500); border-style: dashed; }
 .chip-repeat .chip-num, .chip-repeat .chip-tag { color: var(--teal-700); }
@@ -439,14 +433,23 @@
 .rules-note { padding: 10px 12px; background: var(--gold-100); border-radius: var(--radius-md); font-weight: 700; color: var(--red-900); }
 .modal-wide .modal-body { max-height: 60vh; overflow-y: auto; }
 
-@media print {
-  @page { margin: 12mm; }
-  body { background: #fff; }
-  body > *:not(.receipt-overlay) { display: none !important; }
-  .receipt-overlay { position: static; display: block; background: #fff; }
-  .receipt-scroll { overflow: visible; padding: 0; }
-  .receipt { max-width: none; border: 2px solid #000; break-inside: avoid; }
-  .receipt-actions { display: none !important; }
-  .rc-row, .rc-total { font-size: 14pt; }
-  .rc-title { font-size: 22pt; }
+/* ===== 介面選擇（進站視窗＋設定頁）、連抽結果視窗 ===== */
+.layout-opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.layout-opt {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-height: 92px; padding: 8px 4px; text-align: center;
+  background: #fff; color: var(--red-700); border: 2px solid var(--line); border-radius: var(--radius-md);
+  font-weight: 700;
 }
+.layout-opt-icon { font-size: 1.6rem; line-height: 1; }
+.layout-opt-text { font-size: var(--fs-md); font-weight: 900; }
+.layout-opt-desc { font-size: .72rem; font-weight: 600; color: var(--muted); line-height: 1.25; }
+.layout-opt:active { background: var(--gold-100); }
+.layout-opt.is-active { background: var(--gold-100); border-color: var(--red-700); box-shadow: 0 0 0 2px rgba(209, 42, 60, .18); }
+
+.batch-modal { display: flex; flex-direction: column; gap: 12px; }
+.batch-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 8px; }
+.batch-results .chip { min-height: 92px; }
+.batch-results .chip-num { font-size: 1.9rem; }
+.batch-results .chip-tag { font-size: .9rem; }
+.batch-summary { text-align: center; font-weight: 700; color: var(--red-900); }

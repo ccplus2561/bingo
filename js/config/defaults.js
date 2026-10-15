@@ -68,7 +68,7 @@ export const DEFAULT_SETTINGS = {
   newCardCount: 0,
   renewCardCount: 0,
   drawPrice: 10,
-  maxBatchDraws: 10,
+  maxBatchDraws: 5, // 連抽最高 5 次
   maxBatchAmount: 100,
   prizeRatio: [50, 30, 20],
   consolationAmount: 50,

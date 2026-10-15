@@ -3,6 +3,7 @@ import { getState, setState, reset, subscribe } from '../core/state.js';
 import { DEFAULT_SETTINGS, LIMITS } from '../config/defaults.js';
 import { el, toast, confirmDialog } from '../utils/dom.js';
 import { formatMoney } from '../utils/format.js';
+import { createLayoutPicker } from './layout-switch.js';
 
 // ---------- 驗證（純函式，可在 Node 測試） ----------
 
@@ -19,7 +20,7 @@ const NUMBER_RULES = {
 
 const fail = (message) => ({ ok: false, message });
 
-/** 單抽單價上限 = 單次付費上限 ÷ 連抽上限（預設 100 ÷ 10 = 10 元） */
+/** 單抽單價上限 = 單次付費上限 ÷ 連抽上限（預設 100 ÷ 5 = 20 元） */
 export function drawPriceLimit(settings) {
   return Math.floor(settings.maxBatchAmount / settings.maxBatchDraws);
 }
@@ -83,6 +84,7 @@ function isEditable(key, status) {
 
 export function initSettings(root) {
   let signature = '';
+  const layoutPicker = createLayoutPicker(); // 只建立一次，重繪設定頁時沿用同一個節點
 
   function setError(key, message) {
     const node = root.querySelector(`#err-${key}`);
@@ -271,6 +273,12 @@ export function initSettings(root) {
           );
 
     root.replaceChildren(
+      el(
+        'div',
+        { class: 'card' },
+        el('h2', { class: 'card-title' }, '介面'),
+        layoutPicker.node
+      ),
       el(
         'div',
         { class: 'card' },

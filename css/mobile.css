@@ -40,12 +40,6 @@
 }
 
 .header-right { display: flex; align-items: center; gap: 8px; }
-.layout-btn {
-  min-height: 40px; padding: 0 12px; border-radius: 999px; white-space: nowrap;
-  border: 2px solid var(--gold-500); background: transparent; color: var(--gold-100);
-  font-size: var(--fs-sm); font-weight: 700;
-}
-.layout-btn:active { background: rgba(232, 169, 44, .25); }
 
 /* 抽號分頁（手機）：抽號卡 → 矩陣，單欄往下排；獎金池在自己的分頁（左欄只在電腦版顯示） */
 .panel-draw { display: flex; flex-direction: column; }
@@ -61,7 +55,6 @@
   .header-right { gap: 5px; }
   .hdr-btn { flex-direction: column; gap: 0; padding: 0 6px; line-height: 1.1; }
   .hdr-text { font-size: .62rem; }
-  .layout-btn { padding: 0 9px; }
   .status-badge { padding: 0 8px; font-size: .75rem; }
 }
 /* 更窄（≤400px）：狀態徽章縮成兩個字，完整文字仍保留給讀屏軟體 */

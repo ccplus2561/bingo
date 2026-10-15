@@ -6,7 +6,7 @@ import { initDrawView } from './ui/draw-view.js';
 import { initPrizeView } from './ui/prize-view.js';
 import { initBoardView } from './ui/board-view.js';
 import { initCheckView } from './ui/check-view.js';
-import { initLayoutSwitch } from './ui/layout-switch.js';
+import { initLayoutSwitch, openLayoutPicker } from './ui/layout-switch.js';
 import { initEffects } from './ui/effects.js';
 import { initRulesView } from './ui/rules-view.js';
 import { openReceipt } from './ui/receipt-view.js';
@@ -15,7 +15,7 @@ const STATUS_TEXT = { setup: '設定中', playing: '遊戲進行中', ended: '�
 
 function start() {
   load();
-  initLayoutSwitch(document.getElementById('layout-btn'));
+  initLayoutSwitch();
   initTabs(document.getElementById('tab-bar'), document.querySelectorAll('[data-panel]'));
   initPrizeView(document.getElementById('pool-root')); // 電腦版左欄：與獎金池分頁共用同一份邏輯
   initDrawView(document.getElementById('draw-root'));
@@ -42,6 +42,9 @@ function start() {
   // 載入完成：移除載入畫面
   const boot = document.getElementById('boot');
   if (boot) boot.hidden = true;
+
+  // 每次進入網頁都先讓使用者選擇介面（自動／手機／電腦），之後可到「設定」更改
+  openLayoutPicker();
 }
 
 start();
