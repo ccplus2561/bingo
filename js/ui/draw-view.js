@@ -2,10 +2,9 @@
 // DOM 只建立一次，之後由 state.subscribe 驅動更新（按鈕不會被重建，鍵盤焦點與遙控器操作不中斷）。
 import { getState, setState, subscribe } from '../core/state.js';
 import { drawOne, drawnNumbers, appendRecords } from '../core/draw-engine.js';
-import { paidDraw, maxBatchCount } from '../core/batch-draw.js';
-import { undoLast } from '../core/undo.js';
+import { paidDraw, maxBatchCount, maxBatchAmount } from '../core/batch-draw.js';
 import { canDeclareRank, declareRank, nextRank, retractLastRank, coveredPositions } from '../core/ranks.js';
-import { NUMBER_MAX, TICKER_SIZE, FINANCE, BATCH_PLAY_INTERVAL_MS } from '../config/defaults.js';
+import { NUMBER_MAX, FINANCE, BATCH_PLAY_INTERVAL_MS } from '../config/defaults.js';
 import { el, toast, confirmDialog, showModal } from '../utils/dom.js';
 import { bingoLetter, formatMoney } from '../utils/format.js';
 import { createCheckPanel } from './check-view.js';
@@ -21,7 +20,6 @@ const KIND = {
 const MESSAGES = {
   ALL_DRAWN: '號碼已全部抽出',
   NOT_PLAYING: '請先到設定頁開始遊戲',
-  NOTHING_TO_UNDO: '沒有可撤回的紀錄',
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -52,7 +50,7 @@ function createStepper({ min = 1, max = 10, value = 1, label, onChange }) {
 
 export function initDrawView(root) {
   let prevLen = null; // 上次渲染時的 history 長度，用來判斷「剛抽出新的一筆」才播放動畫
-  let busy = false; // 連抽播放中：鎖住所有抽號／撤回／名次／結束按鈕
+  let busy = false; // 連抽播放中：鎖住所有抽號／名次／結束按鈕
 
   // ---- 大號碼區 ----
   const ball = el('div', { class: 'ball-xl', dataset: { kind: 'none' }, 'aria-live': 'polite', 'aria-atomic': 'true' });
@@ -69,14 +67,9 @@ export function initDrawView(root) {
   const batchBtn = el('button', { type: 'button', class: 'btn btn-gold btn-batch', onClick: onBatch }, batchLabel, batchSub);
 
   // ---- 其他操作 ----
-  const undoBtn = el('button', { type: 'button', class: 'btn btn-secondary btn-tool', onClick: onUndo }, '↩ 撤回上一個');
   const rankBtn = el('button', { type: 'button', class: 'btn btn-primary btn-tool', onClick: openRankDialog });
   const checkBtn = el('button', { type: 'button', class: 'btn btn-secondary btn-tool btn-check-modal', onClick: openCheckModal }, '🔍 驗卡');
   const endBtn = el('button', { type: 'button', class: 'btn btn-danger-outline btn-tool btn-end', onClick: onEnd }, '🏁 結束遊戲');
-
-  // ---- 走馬燈：固定 5 格，避免版面跳動 ----
-  const slots = Array.from({ length: TICKER_SIZE }, () => el('div', { class: 'chip is-empty' }));
-  const ticker = el('div', { class: 'ticker', role: 'list', 'aria-label': `最新 ${TICKER_SIZE} 次抽號` }, ...slots);
 
   root.replaceChildren(
     el('div', { class: 'draw-panel' },
@@ -84,9 +77,8 @@ export function initDrawView(root) {
       caption,
       gotoSettings,
       el('div', { class: 'batch-row' }, stepper.node, batchBtn),
-      el('div', { class: 'draw-tools' }, undoBtn, rankBtn, checkBtn, endBtn),
-      hint,
-      el('div', { class: 'ticker-wrap' }, el('p', { class: 'ticker-title' }, `最新 ${TICKER_SIZE} 次`), ticker)
+      el('div', { class: 'draw-tools' }, rankBtn, checkBtn, endBtn),
+      hint
     )
   );
 
@@ -131,9 +123,23 @@ export function initDrawView(root) {
     const price = getState().settings.drawPrice;
     const grid = el('div', { class: 'batch-results', role: 'list', 'aria-label': '本次連抽結果' },
       ...Array.from({ length: total }, () => el('div', { class: 'chip is-empty', role: 'listitem' })));
+    grid.style.setProperty('--n', String(total));
     const summary = el('p', { class: 'batch-summary', 'aria-live': 'polite' }, `連抽 ${total} 次，抽號中…`);
-    const modal = showModal({ title: `🎰 連抽 ${total} 次`, content: el('div', { class: 'batch-modal' }, grid, summary), actions: [{ text: '確定', kind: 'primary' }], wide: true });
-    const okBtn = grid.closest('.modal-overlay')?.querySelector('.modal-actions .btn');
+    const modal = showModal({ title: `🎰 連抽 ${total} 次`, content: el('div', { class: 'batch-modal' }, grid, summary), actions: [{ text: '確定', kind: 'primary' }], onClose: () => { if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {}); } });
+    const overlay = grid.closest('.modal-overlay');
+    overlay.classList.add('batch-overlay');
+    overlay.querySelector('.modal').classList.add('modal-batch');
+    const fsBtn = el('button', { type: 'button', class: 'batch-fs', 'aria-pressed': 'false', onClick: () => {
+      const on = overlay.classList.toggle('is-full');
+      fsBtn.textContent = on ? '🗗 還原' : '⛶ 全螢幕';
+      fsBtn.setAttribute('aria-pressed', String(on));
+      try { // 盡量進入瀏覽器真正的全螢幕；不支援時仍有鋪滿視窗的效果
+        if (on && overlay.requestFullscreen) overlay.requestFullscreen().catch(() => {});
+        else if (!on && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      } catch { /* 忽略 */ }
+    } }, '⛶ 全螢幕');
+    overlay.querySelector('.modal').append(fsBtn);
+    const okBtn = overlay.querySelector('.modal-actions .btn');
     if (okBtn) okBtn.disabled = true;
 
     const startLen = getState().game.history.length;
@@ -163,22 +169,6 @@ export function initDrawView(root) {
     if (okBtn) { okBtn.disabled = false; okBtn.focus(); }
     if (result.drawn < result.requested) toast(`號碼已抽完，實際抽出 ${result.drawn} 次`);
     return modal;
-  }
-
-  async function onUndo() {
-    if (busy) return;
-    const { settings, game } = getState();
-    const last = game.history[game.history.length - 1];
-    if (!last) {
-      toast(MESSAGES.NOTHING_TO_UNDO, 'error');
-      return;
-    }
-    const what = last.type === 'blank' ? '銘謝惠顧' : last.type === 'repeat' ? `重複號碼 ${last.number}` : `號碼 ${last.number}`;
-    const lines = [`將撤回第 ${last.seq} 次抽號（${what}）。`];
-    if (last.paid) lines.push(`這是付費抽號，將退回 ${formatMoney(settings.drawPrice)}（彩池與付費次數同步扣回）。`);
-    if (game.ranks.some((r) => r.atSeq >= game.history.length)) lines.push('在這次抽號登錄的名次也會一併取消。');
-    const ok = await confirmDialog({ title: '撤回上一個？', message: lines.join('\n'), confirmText: '↩ 撤回', danger: true });
-    if (ok) run(() => undoLast(getState()));
   }
 
   function openRankDialog() {
@@ -264,17 +254,6 @@ export function initDrawView(root) {
     }
   }
 
-  function chipFor(record, isNewest, fresh) {
-    const isBlank = record.type === 'blank';
-    return el('div', {
-      class: `chip chip-${record.type}${isNewest ? ' is-newest' : ''}${isNewest && fresh ? ' is-fresh' : ''}`,
-      role: 'listitem',
-    },
-      el('span', { class: 'chip-num' }, isBlank ? '🙏' : `${bingoLetter(record.number)}${record.number}`),
-      el('span', { class: 'chip-tag' }, KIND[record.type].tag)
-    );
-  }
-
   function update() {
     const state = getState();
     const { settings, game } = state;
@@ -299,14 +278,13 @@ export function initDrawView(root) {
     stepper.setBounds(1, maxCount);
     const n = stepper.get();
     const amount = n * settings.drawPrice;
-    const overLimit = n > settings.maxBatchDraws || amount > settings.maxBatchAmount;
+    const overLimit = n > settings.maxBatchDraws;
     batchLabel.textContent = `🎰 連抽 ${n} 次`;
-    batchSub.textContent = `${formatMoney(amount)}（上限 ${formatMoney(settings.maxBatchAmount)}）`;
+    batchSub.textContent = `${formatMoney(amount)}（上限為 ${formatMoney(maxBatchAmount(settings))}）`;
     batchBtn.disabled = !canDraw || overLimit;
     if (busy || !playing) stepper.setDisabled(true);
 
-    // 撤回、名次、結束
-    undoBtn.disabled = !playing || busy || history.length === 0;
+    // 名次、結束
     const rankFull = coveredPositions(game.ranks) >= FINANCE.prizeRankCount;
     rankBtn.textContent = rankFull ? '🎉 名次已登錄完' : `🎉 第 ${nextRank(state)} 名賓果`;
     // 名次全滿時仍可開啟視窗（用來取消上一個名次登錄）；尚無名次又無法登錄時才禁用
@@ -318,15 +296,6 @@ export function initDrawView(root) {
     hint.textContent = ended ? '本局已結束，可查看結算收據或到設定頁開新局' : !playing ? MESSAGES.NOT_PLAYING : busy ? '連抽播放中，請稍候…' : allDrawn ? MESSAGES.ALL_DRAWN : '';
     hint.classList.toggle('is-warn', allDrawn && playing && !busy);
     gotoSettings.hidden = playing || ended;
-
-    // 走馬燈：最新在最左
-    const recent = history.slice(-TICKER_SIZE).reverse();
-    slots.forEach((slot, i) => {
-      const record = recent[i];
-      const next = record ? chipFor(record, i === 0, fresh) : el('div', { class: 'chip is-empty' });
-      slot.replaceWith(next);
-      slots[i] = next;
-    });
 
     prevLen = history.length;
   }

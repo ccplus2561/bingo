@@ -44,8 +44,10 @@
 /* 抽號分頁（手機）：抽號卡 → 矩陣，單欄往下排；獎金池在自己的分頁（左欄只在電腦版顯示） */
 .panel-draw { display: flex; flex-direction: column; }
 .col-center { order: 1; }
+.col-ticker { order: 2; }
 .col-left { display: none; }
-.col-right { order: 2; }
+.col-right { order: 3; }
+.hdr-settings { display: none; } /* 手機版設定在底部分頁；電腦版才在標題列顯示 */
 
 /* 窄螢幕：標題列單行不換行；開關改為「圖示＋小字」直式排列 */
 .brand, .status-badge { white-space: nowrap; }

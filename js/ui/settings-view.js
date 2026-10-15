@@ -20,9 +20,9 @@ const NUMBER_RULES = {
 
 const fail = (message) => ({ ok: false, message });
 
-/** 單抽單價上限 = 單次付費上限 ÷ 連抽上限（預設 100 ÷ 5 = 20 元） */
-export function drawPriceLimit(settings) {
-  return Math.floor(settings.maxBatchAmount / settings.maxBatchDraws);
+/** 單抽單價上限：只受一般輸入上限限制（連抽付費上限 = 單抽單價 × 連抽上限，自動套用） */
+export function drawPriceLimit() {
+  return LIMITS.maxPrice;
 }
 
 /** 驗證單一數字欄位，回傳 {ok:true,value} 或 {ok:false,message} */
@@ -38,10 +38,7 @@ export function validateNumberField(key, raw, settings = DEFAULT_SETTINGS) {
   const min = rule.min ?? 0;
   if (n < min) return fail(`${rule.label}至少為 ${min}`);
   if (key === 'drawPrice') {
-    const limit = drawPriceLimit(settings);
-    if (n > limit) {
-      return fail(`單抽單價 × ${settings.maxBatchDraws} 抽不可超過 ${settings.maxBatchAmount} 元（單抽最高 ${limit} 元）`);
-    }
+    if (n > drawPriceLimit(settings)) return fail(`${rule.label}不可超過 ${drawPriceLimit(settings)}`);
   } else if (rule.max !== undefined && n > rule.max) {
     return fail(`${rule.label}不可超過 ${rule.max}`);
   }
@@ -249,7 +246,6 @@ export function initSettings(root) {
     const { settings, game } = getState();
     const status = game.status;
     signature = `${status}|${settings.locked}`;
-    const limit = drawPriceLimit(settings);
 
     const startCard =
       status === 'setup'
@@ -297,7 +293,7 @@ export function initSettings(root) {
           'drawPrice',
           '單抽單價（元）',
           status,
-          `單次付費上限 ${formatMoney(settings.maxBatchAmount)} ${settings.maxBatchDraws} 抽（單抽最高 ${formatMoney(limit)}）`
+          `連抽最高 ${settings.maxBatchDraws} 次，單次付費上限 = 單抽單價 × ${settings.maxBatchDraws}（目前 ${formatMoney(settings.drawPrice * settings.maxBatchDraws)}）`
         ),
         toggleField('allowRepeat', '允許重複數字', '可能抽到已出現過的號碼', status),
         toggleField('allowBlank', '允許銘謝惠顧', '可能抽到無號碼的空籤', status)

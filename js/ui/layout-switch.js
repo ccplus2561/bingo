@@ -1,12 +1,12 @@
 // 響應式與手動切換：決定實際版面（mobile / desktop），寫到 <html data-layout>。
 // 偏好存在 state.ui.layout（'auto' | 'mobile' | 'desktop'），重新整理後保留。
-// 每次進入網頁會跳出選擇視窗（openLayoutPicker）；之後可在「設定」頁的「介面」區更改（createLayoutPicker）。
+// 只有手機版／電腦版兩種（預設手機版）。每次進入網頁會跳出選擇視窗（openLayoutPicker）；之後可在「設定」頁的「介面」區更改（createLayoutPicker）。
 import { LAYOUTS, LAYOUT_BREAKPOINT } from '../config/defaults.js';
 import { getState, setState, subscribe } from '../core/state.js';
 import { el, showModal } from '../utils/dom.js';
 
 export const LAYOUT_LABELS = {
-  auto: { icon: '🖥️', text: '自動', desc: '依螢幕寬度自動判斷' },
+  auto: { icon: '🖥️', text: '自動', desc: '依螢幕寬度自動判斷' }, // 已不在選單中，保留供舊資料對照
   mobile: { icon: '📱', text: '手機', desc: '單欄，底部分頁' },
   desktop: { icon: '🖥️', text: '電腦', desc: '三欄免滾動，適合投屏' },
 };

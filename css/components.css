@@ -309,7 +309,7 @@
 .btn-batch { flex-direction: column; gap: 0; line-height: 1.25; min-height: 56px; font-size: 1.15rem; padding: 4px 8px; }
 .draw-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .btn-tool { min-height: 52px; font-size: 1rem; padding: 0 8px; }
-.draw-tools .btn-end { grid-column: 1 / -1; }
+
 .btn-check-modal { display: none; } /* 手機已有「驗卡」分頁；電腦版才在抽號頁提供彈窗 */
 
 .modal-body { margin: 8px 0 18px; }
@@ -434,7 +434,7 @@
 .modal-wide .modal-body { max-height: 60vh; overflow-y: auto; }
 
 /* ===== 介面選擇（進站視窗＋設定頁）、連抽結果視窗 ===== */
-.layout-opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.layout-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
 .layout-opt {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   min-height: 92px; padding: 8px 4px; text-align: center;
@@ -447,9 +447,35 @@
 .layout-opt:active { background: var(--gold-100); }
 .layout-opt.is-active { background: var(--gold-100); border-color: var(--red-700); box-shadow: 0 0 0 2px rgba(209, 42, 60, .18); }
 
-.batch-modal { display: flex; flex-direction: column; gap: 12px; }
-.batch-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 8px; }
-.batch-results .chip { min-height: 92px; }
-.batch-results .chip-num { font-size: 1.9rem; }
-.batch-results .chip-tag { font-size: .9rem; }
-.batch-summary { text-align: center; font-weight: 700; color: var(--red-900); }
+.modal-batch { position: relative; max-width: min(900px, 96vw); padding: 22px; }
+.batch-modal { display: flex; flex-direction: column; gap: 14px; }
+.batch-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+.batch-results .chip { min-height: 140px; border-radius: 16px; }
+.batch-results .chip-num { font-size: clamp(2.2rem, 6vw, 3.6rem); }
+.batch-results .chip-tag { font-size: 1.1rem; }
+.batch-summary { text-align: center; font-weight: 700; color: var(--red-900); font-size: 1.15rem; }
+.batch-fs {
+  position: absolute; top: 14px; right: 14px; min-height: 40px; padding: 0 14px; border-radius: 999px;
+  border: 2px solid var(--gold-500); background: #fff; color: var(--red-700); font-weight: 700; font-size: var(--fs-sm);
+}
+.modal-batch .modal-title { padding-right: 120px; }
+/* 全螢幕：鋪滿整個視窗，5 張結果大卡一字排開 */
+.batch-overlay.is-full { padding: 0; background: var(--paper); }
+.batch-overlay.is-full .modal-batch {
+  max-width: none; width: 100%; height: 100%; border: 0; border-radius: 0;
+  display: flex; flex-direction: column; padding: 24px clamp(16px, 4vw, 56px);
+}
+.batch-overlay.is-full .modal-body { flex: 1; display: flex; max-height: none; overflow: auto; margin: 12px 0; }
+.batch-overlay.is-full .batch-modal { flex: 1; justify-content: center; width: 100%; }
+.batch-overlay.is-full .batch-results { grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: clamp(8px, 1.6vw, 28px); }
+@media (max-width: 700px) { .batch-overlay.is-full .batch-results { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); } }
+.batch-overlay.is-full .batch-results .chip { min-height: clamp(140px, 32vh, 320px); }
+.batch-overlay.is-full .batch-results .chip-num { font-size: clamp(2.2rem, 6.4vw, 6.5rem); }
+.batch-overlay.is-full .batch-results .chip-tag { font-size: clamp(1.1rem, 2vw, 2rem); }
+.batch-overlay.is-full .batch-summary { font-size: clamp(1.2rem, 2.4vw, 2.2rem); }
+.batch-overlay.is-full .modal-title { font-size: clamp(1.6rem, 3vw, 2.6rem); }
+.batch-overlay.is-full .modal-actions .btn { min-height: 64px; font-size: 1.4rem; }
+.ticker-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  padding: 12px 16px; margin-bottom: 14px;
+}

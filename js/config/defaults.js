@@ -40,7 +40,7 @@ export const TAB_LIST = [
 ];
 
 export const GAME_STATUS = ['setup', 'playing', 'ended'];
-export const LAYOUTS = ['auto', 'mobile', 'desktop'];
+export const LAYOUTS = ['mobile', 'desktop']; // 只提供手機版／電腦版（無自動）
 
 // 抽號暗控參數（單一來源，可自行調整）
 export const DRAW_RULES = {
@@ -87,7 +87,7 @@ export const DEFAULT_GAME = {
 };
 
 export const DEFAULT_UI = {
-  layout: 'auto',
+  layout: 'mobile',
   soundOn: false,
   ttsOn: false,
   tab: 'draw',
