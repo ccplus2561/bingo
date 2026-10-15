@@ -290,13 +290,17 @@ export function initSettings(root) {
         toggleField('allowRepeat', '允許重複數字', '可能抽到已出現過的號碼', status),
         toggleField('allowBlank', '允許銘謝惠顧', '可能抽到無號碼的空籤', status)
       ),
+      // 預設收合：避免他人看到保底（安慰獎）金額；每次重繪都回到收合
       el(
-        'div',
-        { class: 'card' },
-        el('h2', { class: 'card-title' }, '獎金設定'),
-        ratioField(status),
-        numberField('consolationAmount', '安慰獎金額（每人，元）', status),
-        numberField('hostFeePercent', '主持人辛苦費（%）', status)
+        'details',
+        { class: 'card prize-fold' },
+        el('summary', { class: 'prize-sum' },
+          el('span', { class: 'card-title' }, '獎金設定'),
+          el('span', { class: 'prize-sum-hint' }, '🔒 點擊展開（含保底金額，請避開他人視線）')),
+        el('div', { class: 'prize-body' },
+          ratioField(status),
+          numberField('consolationAmount', '安慰獎金額（每人，元）', status),
+          numberField('hostFeePercent', '主持人辛苦費（%）', status))
       ),
       startCard,
       el(

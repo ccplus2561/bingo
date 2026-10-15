@@ -15,7 +15,7 @@ const row = (label, value, cls = '') =>
 function slotRow(slot) {
   if (slot.status === 'declared') {
     const tie = slot.winners > 1 ? `（同時 ${slot.winners} 人）` : '';
-    return row(`🎉 第 ${slot.position} 名已出爐${tie}`, `每人 ${formatMoney(slot.perPerson)}`, 'is-declared');
+    return row(`🎉 第 ${slot.position} 名已出爐${tie}`, `${slot.winners > 1 ? '各 ' : ''}${formatMoney(slot.perPerson)}`, 'is-declared');
   }
   if (slot.status === 'merged') {
     return row(`第 ${slot.position} 名`, `併入第 ${slot.mergedInto} 名平分`, 'is-merged');
