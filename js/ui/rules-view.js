@@ -3,7 +3,7 @@ import { el, showModal } from '../utils/dom.js';
 import { speak, cancel, isSupported } from '../audio/tts.js';
 
 const SECTIONS = [
-  ['號碼範圍', ['本局使用 1～75 號，分為 B（1～15）、I（16～30）、N（31～45）、G（46～60）、O（61～75）五欄。']],
+  ['號碼範圍', ['本局使用 1～75 號。']],
   ['獎金機制', [
     '設有前三名獎金與安慰獎。總彩池 = 新卡收入 + 續卡收入 + 付費抽號收入。',
     '前三名依設定比例分配獎金；未得名的玩家每人可領安慰獎。',

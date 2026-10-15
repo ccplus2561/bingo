@@ -24,7 +24,7 @@ export function phraseForRecord(record) {
   if (!record) return '';
   if (record.type === 'blank') return '銘謝惠顧';
   if (record.type === 'repeat') return '重複號碼';
-  return `${letterOf(record.number)}，${numberToZh(record.number)}號`;
+  return `${numberToZh(record.number)}號`;
 }
 
 /** 名次 → 「第一名賓果」 */

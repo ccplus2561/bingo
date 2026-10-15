@@ -44,7 +44,7 @@ export function createCheckPanel() {
       ...results.map((r) =>
         el('li', { class: `check-row ${r.drawn ? 'is-hit' : 'is-miss'}` },
           el('span', { class: 'check-icon', 'aria-hidden': 'true' }, r.drawn ? '✅' : '❌'),
-          el('strong', { class: 'check-num' }, `${bingoLetter(r.number)} ${r.number}`),
+          el('strong', { class: 'check-num' }, `${r.number}`),
           el('span', { class: 'check-text' },
             r.drawn ? `已抽中（第 ${r.seq} 次${r.count > 1 ? `，重複出現 ${r.count} 次` : ''}）` : '未抽中'))
       ),

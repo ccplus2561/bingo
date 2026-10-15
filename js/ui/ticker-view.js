@@ -18,7 +18,7 @@ export function initTickerView(root) {
       class: `chip chip-${record.type}${isNewest ? ' is-newest' : ''}${isNewest && fresh ? ' is-fresh' : ''}`,
       role: 'listitem',
     },
-      el('span', { class: 'chip-num' }, record.type === 'blank' ? '🙏' : `${bingoLetter(record.number)}${record.number}`),
+      el('span', { class: 'chip-num' }, record.type === 'blank' ? '🙏' : `${record.number}`),
       el('span', { class: 'chip-tag' }, TAG[record.type])
     );
   }

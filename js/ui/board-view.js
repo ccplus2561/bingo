@@ -9,7 +9,6 @@ export function initBoardView(root) {
   const cells = new Map(); // 號碼 → 格子元素
   const rows = BOARD_COLUMNS[0].max - BOARD_COLUMNS[0].min + 1;
 
-  const header = BOARD_COLUMNS.map((c) => el('div', { class: `board-head board-head-${c.letter}` }, c.letter));
   const body = [];
   for (let r = 0; r < rows; r++) {
     for (const c of BOARD_COLUMNS) {
@@ -26,7 +25,7 @@ export function initBoardView(root) {
   root.replaceChildren(
     el('div', { class: 'board-wrap' },
       el('h2', { class: 'board-title' }, '號碼矩陣', count),
-      el('div', { class: 'board', role: 'grid', 'aria-label': '1 到 75 號碼矩陣' }, ...header, ...body)
+      el('div', { class: 'board', role: 'grid', 'aria-label': '1 到 75 號碼矩陣' }, ...body)
     )
   );
 

@@ -105,7 +105,7 @@ export function initDrawView(root) {
   /** 一筆抽號結果的小卡（連抽視窗用） */
   function resultChip(record, isLast) {
     return el('div', { class: `chip chip-${record.type} is-fresh${isLast ? ' is-newest' : ''}`, role: 'listitem' },
-      el('span', { class: 'chip-num' }, record.type === 'blank' ? '🙏' : `${bingoLetter(record.number)}${record.number}`),
+      el('span', { class: 'chip-num' }, record.type === 'blank' ? '🙏' : `${record.number}`),
       el('span', { class: 'chip-tag' }, KIND[record.type].tag));
   }
 
@@ -230,7 +230,6 @@ export function initDrawView(root) {
       ball.replaceChildren(el('span', { class: 'ball-word' }, '銘謝', el('br'), '惠顧'));
     } else {
       ball.replaceChildren(
-        el('span', { class: 'ball-letter' }, bingoLetter(last.number)),
         el('span', { class: 'ball-num' }, String(last.number))
       );
     }
