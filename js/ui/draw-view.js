@@ -73,11 +73,12 @@ export function initDrawView(root) {
 
   root.replaceChildren(
     el('div', { class: 'draw-panel' },
+      el('div', { class: 'draw-topbar' }, rankBtn, endBtn),
       stage,
       caption,
       gotoSettings,
       el('div', { class: 'batch-row' }, stepper.node, batchBtn),
-      el('div', { class: 'draw-tools' }, rankBtn, checkBtn, endBtn),
+      el('div', { class: 'draw-tools' }, checkBtn),
       hint
     )
   );

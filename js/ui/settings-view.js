@@ -224,7 +224,7 @@ export function initSettings(root) {
       confirmText: '▶ 開始遊戲',
     });
     if (!ok) return;
-    setState({ settings: { locked: true }, game: { status: 'playing' } });
+    setState({ settings: { locked: true }, game: { status: 'playing' }, ui: { tab: 'draw' } });
     toast('遊戲開始！');
   }
 

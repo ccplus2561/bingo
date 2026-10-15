@@ -479,3 +479,38 @@
   background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg);
   padding: 12px 16px; margin-bottom: 14px;
 }
+
+/* ===== v1.3.0 ===== */
+/* 規則視窗：最大化、大字、朗讀鈕 */
+.rules-overlay { padding: 0; }
+.rules-overlay .modal {
+  max-width: none; width: 100%; height: 100%; border: 0; border-radius: 0;
+  display: flex; flex-direction: column; padding: 20px clamp(16px, 4vw, 64px);
+}
+.rules-overlay .modal-title { font-size: clamp(1.8rem, 3.4vw, 3rem); }
+.rules-overlay .modal-body { flex: 1; max-height: none; overflow-y: auto; margin: 10px 0 14px; font-size: clamp(1.25rem, 2.2vw, 2rem); line-height: 1.6; }
+.rules-overlay .rules-h { font-size: clamp(1.5rem, 2.8vw, 2.4rem); margin-bottom: 4px; }
+.rules-overlay .rules-sec { margin-bottom: 20px; }
+.rules-overlay .rules-note { font-size: inherit; }
+.rules-overlay .modal-actions .btn { min-height: 60px; font-size: 1.4rem; }
+.rules-read { position: sticky; top: 0; z-index: 2; min-height: 56px; margin-bottom: 14px; padding: 0 22px; font-size: 1.3rem; border-color: var(--gold-500); }
+
+/* 名次／結束：抽號卡右上方 */
+.draw-topbar { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.draw-topbar .btn-tool { min-height: 44px; padding: 0 14px; }
+html[data-layout="desktop"] .draw-topbar .btn-tool { min-height: clamp(36px, 5vh, 48px); padding: 0 14px; font-size: clamp(.85rem, 1.9vh, 1.05rem); }
+.draw-tools { grid-template-columns: 1fr; }
+html[data-layout="desktop"] .draw-tools { grid-template-columns: 1fr; }
+
+/* 連抽結果視窗預設就大：近全螢幕、n 張一字排開、大字 */
+.modal-batch { width: 98vw; max-width: 98vw; min-height: 80vh; display: flex; flex-direction: column; }
+.modal-batch .modal-body { flex: 1; display: flex; }
+.modal-batch .batch-modal { flex: 1; justify-content: center; width: 100%; }
+.modal-batch .batch-results { grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: clamp(8px, 1.4vw, 24px); }
+.modal-batch .batch-results .chip { min-height: clamp(160px, 38vh, 360px); }
+.modal-batch .batch-results .chip-num { font-size: clamp(2.4rem, 7vw, 7.5rem); }
+.modal-batch .batch-results .chip-tag { font-size: clamp(1.1rem, 2vw, 2rem); }
+.modal-batch .batch-summary { font-size: clamp(1.2rem, 2.4vw, 2.2rem); }
+.modal-batch .modal-title { font-size: clamp(1.6rem, 3vw, 2.6rem); }
+.modal-batch .modal-actions .btn { min-height: 64px; font-size: 1.4rem; }
+@media (max-width: 700px) { .modal-batch .batch-results { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); } }

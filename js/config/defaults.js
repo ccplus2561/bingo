@@ -72,8 +72,8 @@ export const DEFAULT_SETTINGS = {
   maxBatchAmount: 100,
   prizeRatio: [50, 30, 20],
   consolationAmount: 50,
-  allowRepeat: false,
-  allowBlank: false,
+  allowRepeat: true,
+  allowBlank: true,
   hostFeePercent: 10,
   locked: false,
 };
