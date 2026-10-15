@@ -3,7 +3,6 @@ import { getState, setState, reset, subscribe } from '../core/state.js';
 import { DEFAULT_SETTINGS, LIMITS } from '../config/defaults.js';
 import { el, toast, confirmDialog } from '../utils/dom.js';
 import { formatMoney } from '../utils/format.js';
-import { createLayoutPicker } from './layout-switch.js';
 
 // ---------- 驗證（純函式，可在 Node 測試） ----------
 
@@ -81,7 +80,6 @@ function isEditable(key, status) {
 
 export function initSettings(root) {
   let signature = '';
-  const layoutPicker = createLayoutPicker(); // 只建立一次，重繪設定頁時沿用同一個節點
 
   function setError(key, message) {
     const node = root.querySelector(`#err-${key}`);
@@ -269,12 +267,6 @@ export function initSettings(root) {
           );
 
     root.replaceChildren(
-      el(
-        'div',
-        { class: 'card' },
-        el('h2', { class: 'card-title' }, '介面'),
-        layoutPicker.node
-      ),
       el(
         'div',
         { class: 'card' },

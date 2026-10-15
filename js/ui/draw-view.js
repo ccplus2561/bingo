@@ -8,7 +8,6 @@ import { NUMBER_MAX, FINANCE, BATCH_PLAY_INTERVAL_MS } from '../config/defaults.
 import { el, toast, confirmDialog, showModal } from '../utils/dom.js';
 import { bingoLetter, formatMoney } from '../utils/format.js';
 import { createCheckPanel } from './check-view.js';
-import { endGameFlow, openReceipt } from './receipt-view.js';
 
 const KIND = {
   none: { caption: '尚未抽號', tag: '' },
@@ -48,6 +47,13 @@ function createStepper({ min = 1, max = 10, value = 1, label, onChange }) {
   };
 }
 
+/** 驗卡視窗（由「更多」選單開啟） */
+export function openCheckModal() {
+  const panel = createCheckPanel();
+  showModal({ title: '🔍 驗卡', content: panel.node, wide: true, actions: [{ text: '關閉', kind: 'primary' }], onClose: panel.destroy });
+  panel.focus();
+}
+
 export function initDrawView(root) {
   let prevLen = null; // 上次渲染時的 history 長度，用來判斷「剛抽出新的一筆」才播放動畫
   let busy = false; // 連抽播放中：鎖住所有抽號／名次／結束按鈕
@@ -68,17 +74,14 @@ export function initDrawView(root) {
 
   // ---- 其他操作 ----
   const rankBtn = el('button', { type: 'button', class: 'btn btn-primary btn-tool', onClick: openRankDialog });
-  const checkBtn = el('button', { type: 'button', class: 'btn btn-secondary btn-tool btn-check-modal', onClick: openCheckModal }, '🔍 驗卡');
-  const endBtn = el('button', { type: 'button', class: 'btn btn-danger-outline btn-tool btn-end', onClick: onEnd }, '🏁 結束遊戲');
 
   root.replaceChildren(
     el('div', { class: 'draw-panel' },
-      el('div', { class: 'draw-topbar' }, rankBtn, endBtn),
+      el('div', { class: 'draw-topbar' }, rankBtn),
       stage,
       caption,
       gotoSettings,
       el('div', { class: 'batch-row' }, stepper.node, batchBtn),
-      el('div', { class: 'draw-tools' }, checkBtn),
       hint
     )
   );
@@ -214,18 +217,6 @@ export function initDrawView(root) {
     const modal = showModal({ title: `🎉 第 ${rank} 名賓果`, content, actions });
   }
 
-  function openCheckModal() {
-    const panel = createCheckPanel();
-    showModal({ title: '🔍 驗卡', content: panel.node, wide: true, actions: [{ text: '關閉', kind: 'primary' }], onClose: panel.destroy });
-    panel.focus();
-  }
-
-  async function onEnd() {
-    if (busy) return;
-    if (getState().game.status === 'ended') openReceipt();
-    else await endGameFlow();
-  }
-
   // ---------- 畫面更新 ----------
 
   function fillBall(last) {
@@ -281,8 +272,6 @@ export function initDrawView(root) {
     // 名次全滿時仍可開啟視窗（用來取消上一個名次登錄）；尚無名次又無法登錄時才禁用
     rankBtn.disabled = !playing || busy || (game.ranks.length === 0 && !canDeclareRank(state));
     const ended = game.status === 'ended';
-    endBtn.textContent = ended ? '🧾 查看結算收據' : '🏁 結束遊戲';
-    endBtn.disabled = !(playing || ended) || busy;
 
     hint.textContent = ended ? '本局已結束，可查看結算收據或到設定頁開新局' : !playing ? MESSAGES.NOT_PLAYING : busy ? '連抽播放中，請稍候…' : allDrawn ? MESSAGES.ALL_DRAWN : '';
     hint.classList.toggle('is-warn', allDrawn && playing && !busy);

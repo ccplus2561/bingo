@@ -3,6 +3,7 @@
 import { getState } from '../core/state.js';
 import { el, showModal } from '../utils/dom.js';
 import { endGameFlow, openReceipt } from './receipt-view.js';
+import { openCheckModal } from './draw-view.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -44,19 +45,19 @@ function openMoreMenu() {
 
   const content = el('div', { class: 'more-list' },
     item('❓', '規則', () => $('rules-btn').click()),
-    item('🔍', '驗卡', () => document.querySelector('.btn-check-modal')?.click()),
+    item('🔍', '驗卡', () => openCheckModal()),
     toggleItem('sound-btn', '音效'),
     toggleItem('tts-btn', '語音'),
     item(tab === 'settings' ? '🎲' : '⚙️', tab === 'settings' ? '回到抽號卡' : '設定', () => $('settings-btn').click()),
     item('🏁', status === 'ended' ? '查看結算收據' : '結束遊戲', () => (status === 'ended' ? openReceipt() : endGameFlow()), { disabled: status === 'setup' })
   );
   modal = showModal({ title: '更多', content, actions: [{ text: '關閉', kind: 'secondary' }] });
-  modal.close; // 保留參照
 }
 
 /** 建立「兵果彩盤＋更多」列（電腦版專用，手機版以 CSS 隱藏） */
 export function createDeskBrand() {
   return el('div', { class: 'desk-brand' },
     el('span', { class: 'desk-brand-title' }, '🧧 兵果彩盤'),
+    el('span', { class: 'status-badge', dataset: { status: 'setup' } }, '設定中'),
     el('button', { type: 'button', class: 'btn btn-primary desk-more', onClick: openMoreMenu, 'aria-haspopup': 'dialog' }, '☰ 更多'));
 }
