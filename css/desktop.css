@@ -1,0 +1,82 @@
+/* 電腦三欄免滾動版面：html[data-layout="desktop"]（由 layout-switch.js 設定）。
+   ≥1024px 的「自動」模式、或手動選「電腦」時生效；整頁高度鎖在 100vh 內。 */
+html[data-layout="desktop"] body {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-areas: "hd" "nav" "mn";
+  height: 100vh; height: 100dvh; overflow: hidden;
+}
+html[data-layout="desktop"] .app-header { grid-area: hd; position: static; padding: 8px 24px; }
+html[data-layout="desktop"] .brand { font-size: var(--fs-xl); }
+
+/* 分頁列移到上方，改橫向 */
+html[data-layout="desktop"] .tab-bar {
+  grid-area: nav; position: static; z-index: auto;
+  display: flex; justify-content: center; gap: 8px;
+  padding: 4px 16px; border-top: 0; border-bottom: 2px solid var(--gold-500);
+}
+html[data-layout="desktop"] .tab-btn {
+  flex-direction: row; gap: 8px; min-height: 44px; padding: 0 24px; border-radius: 999px;
+}
+html[data-layout="desktop"] .tab-btn.is-active { background: var(--red-700); color: var(--gold-100); box-shadow: none; }
+html[data-layout="desktop"] .tab-label { font-size: var(--fs-md); }
+
+html[data-layout="desktop"] .app-main {
+  grid-area: mn; max-width: none; margin: 0; padding: 12px 20px; min-height: 0; overflow: hidden;
+}
+html[data-layout="desktop"] #toast-root { bottom: 24px; }
+
+/* 抽號分頁：左 獎金池｜中 大號碼＋走馬燈｜右 矩陣 */
+html[data-layout="desktop"] .panel-draw {
+  display: grid; height: 100%; gap: 16px;
+  grid-template-columns: minmax(220px, 22%) minmax(0, 1fr) minmax(300px, 30%);
+  grid-template-areas: "left center right";
+}
+html[data-layout="desktop"] .col { min-height: 0; order: 0; }
+html[data-layout="desktop"] .col-left { grid-area: left; display: block; }
+html[data-layout="desktop"] .col-center { grid-area: center; }
+html[data-layout="desktop"] .col-right { grid-area: right; }
+
+html[data-layout="desktop"] .draw-panel,
+html[data-layout="desktop"] .board-wrap,
+html[data-layout="desktop"] .prize-card { height: 100%; margin-bottom: 0; }
+
+/* 中欄：球吃掉剩餘高度，其餘控制項壓縮以維持免滾動 */
+html[data-layout="desktop"] .ball-caption-xl { font-size: clamp(1.1rem, 3.2vh, 2rem); }
+html[data-layout="desktop"] .draw-panel { gap: 8px; padding: 12px 16px; }
+html[data-layout="desktop"] .stage { flex: 1 1 0; height: auto; min-height: 0; }
+html[data-layout="desktop"] .draw-actions { grid-template-columns: 1fr 1fr; }
+html[data-layout="desktop"] .btn-xl { min-height: clamp(50px, 7vh, 88px); font-size: clamp(1.05rem, 2.4vh, 1.8rem); }
+html[data-layout="desktop"] .batch-row .stepper button { min-height: clamp(40px, 5.8vh, 56px); }
+html[data-layout="desktop"] .stepper-value { font-size: clamp(1.2rem, 2.8vh, 1.8rem); }
+html[data-layout="desktop"] .btn-batch { min-height: clamp(44px, 6vh, 62px); font-size: clamp(1rem, 2.2vh, 1.4rem); }
+html[data-layout="desktop"] .draw-tools { grid-template-columns: repeat(4, 1fr); }
+html[data-layout="desktop"] .draw-tools .btn-end { grid-column: auto; }
+html[data-layout="desktop"] .btn-tool { min-height: clamp(38px, 5.2vh, 52px); font-size: clamp(.85rem, 1.9vh, 1.05rem); padding: 0 4px; }
+html[data-layout="desktop"] .btn-check-modal { display: inline-flex; }
+html[data-layout="desktop"] .draw-hint { min-height: 0; }
+html[data-layout="desktop"] .chip { min-height: clamp(56px, 8vh, 100px); }
+html[data-layout="desktop"] .ticker-title { margin-bottom: 2px; }
+html[data-layout="desktop"] .chip-tag { font-size: clamp(.8rem, 1.9vh, 1.15rem); }
+html[data-layout="desktop"] .chip-paid { font-size: clamp(.76rem, 1.7vh, 1rem); }
+html[data-layout="desktop"] .btn-goto { min-height: clamp(40px, 5.5vh, 56px); }
+html[data-layout="desktop"] .hdr-btn, html[data-layout="desktop"] .layout-btn { min-height: 44px; font-size: var(--fs-md); }
+
+/* 左欄：獎金池，字級與列高隨視窗高度縮放，維持免滾動 */
+html[data-layout="desktop"] .prize-card { display: flex; flex-direction: column; padding: 12px 16px; overflow: hidden; }
+html[data-layout="desktop"] .pool-main { padding: 0 0 4px; }
+html[data-layout="desktop"] .pool-label { font-size: clamp(.9rem, 2vh, 1.1rem); }
+html[data-layout="desktop"] .pool-amount-xl { font-size: clamp(1.8rem, 5vh, 3.4rem); line-height: 1.2; }
+html[data-layout="desktop"] .pr-row { min-height: clamp(28px, 4.2vh, 40px); font-size: clamp(.85rem, 2.1vh, 1.2rem); }
+html[data-layout="desktop"] .prize-card .sub-title { margin-top: 6px; font-size: clamp(.85rem, 2vh, 1.1rem); }
+html[data-layout="desktop"] .pr-foot { margin-top: auto; }
+
+/* 右欄：15 列均分高度，字級隨視窗高度縮放 */
+html[data-layout="desktop"] .board { grid-template-rows: auto repeat(15, minmax(0, 1fr)); }
+html[data-layout="desktop"] .board-cell { font-size: clamp(.85rem, 2.4vh, 1.8rem); }
+html[data-layout="desktop"] .board-head { font-size: clamp(1.1rem, 3vh, 2rem); line-height: 1.3; }
+
+/* 其他分頁（驗卡、獎金池、設定）：置中、內容過長時只在內容區捲動 */
+html[data-layout="desktop"] [data-panel]:not(.panel-draw) {
+  height: 100%; overflow-y: auto; max-width: 820px; margin: 0 auto;
+}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#8f1124">
+  <title>兵果彩盤</title>
+  <meta name="description" content="除夕家族聚會用的賓果彩盤：抽號、彩池與獎金一目了然，電視投屏即可使用。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="兵果彩盤">
+  <meta property="og:description" content="除夕家族聚會用的賓果彩盤：抽號、彩池與獎金一目了然。">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%A7%A7%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/desktop.css">
+</head>
+<body>
+  <div id="boot" class="boot" role="status" aria-live="polite">
+    <div class="boot-icon" aria-hidden="true">🧧</div>
+    <p id="boot-text">載入中…</p>
+  </div>
+
+  <div id="file-warning" class="file-warning" hidden>
+    請用 http 伺服器開啟本頁（例如 <code>npx serve</code> 或 <code>python -m http.server</code>），直接雙擊 index.html 無法載入模組。
+  </div>
+
+  <header class="app-header">
+    <h1 class="brand">🧧 兵果彩盤</h1>
+    <div class="header-right">
+      <button id="receipt-btn" class="hdr-btn" type="button" hidden aria-label="查看結算收據"><span class="hdr-icon" aria-hidden="true">🧾</span><span class="hdr-text">收據</span></button>
+      <button id="rules-btn" class="hdr-btn" type="button" aria-label="規則說明"><span class="hdr-icon" aria-hidden="true">❓</span><span class="hdr-text">規則</span></button>
+      <span id="status-badge" class="status-badge" data-status="setup">設定中</span>
+      <button id="sound-btn" class="hdr-btn" type="button" aria-pressed="false" aria-label="音效：關閉，點擊開啟"><span class="hdr-icon" aria-hidden="true">🔇</span><span class="hdr-text">音效</span></button>
+      <button id="tts-btn" class="hdr-btn" type="button" aria-pressed="false" aria-label="語音：關閉，點擊開啟"><span class="hdr-icon" aria-hidden="true">🔇</span><span class="hdr-text">語音</span></button>
+      <button id="layout-btn" class="layout-btn" type="button">🖥️ 自動</button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <section data-panel="draw" class="panel-draw" aria-label="抽號卡" hidden>
+      <div class="col col-center" id="draw-root"></div>
+      <div class="col col-left" id="pool-root"></div>
+      <div class="col col-right" id="board-root"></div>
+    </section>
+
+    <section data-panel="check" aria-label="驗卡" hidden>
+      <div id="check-root"></div>
+    </section>
+
+    <section data-panel="prize" aria-label="獎金池" hidden>
+      <div id="prize-root"></div>
+    </section>
+
+    <section data-panel="settings" aria-label="設定" hidden>
+      <div id="settings-root"></div>
+    </section>
+  </main>
+
+  <nav id="tab-bar" class="tab-bar" role="tablist" aria-label="主選單"></nav>
+
+  <noscript><p class="file-warning">本頁需要啟用 JavaScript。</p></noscript>
+  <script>
+    if (location.protocol === 'file:') document.getElementById('file-warning').hidden = false;
+    // 載入狀態：main.js 啟動後會移除 #boot；逾時仍未啟動就提示可能的原因
+    setTimeout(function () {
+      var boot = document.getElementById('boot');
+      if (boot && !boot.hidden) {
+        document.getElementById('boot-text').textContent = '載入失敗，請用 http 伺服器開啟並重新整理頁面。';
+        boot.classList.add('is-failed');
+      }
+    }, 6000);
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
