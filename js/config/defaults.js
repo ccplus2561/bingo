@@ -89,7 +89,6 @@ export const DEFAULT_GAME = {
 export const DEFAULT_UI = {
   layout: 'mobile',
   soundOn: false,
-  ttsOn: false,
   tab: 'draw',
 };
 

@@ -1,12 +1,10 @@
-// 氣氛層（階段 6）：頂部聲音／語音開關、依 state 變化播放音效與語音、賓果慶祝動畫。
+// 氣氛層（階段 6）：頂部音效開關、依 state 變化播放音效與語音、賓果慶祝動畫。
 // 設計：只「訂閱」state 並比對前後差異，不介入 draw-view 的操作流程，也不修改 core。
-//   抽出新的一筆 → 滾動聲 ＋ 結果音效 ＋ 語音
+//   抽出新的一筆 → 滾動聲 ＋ 結果音效
 //   history 變短  → 撤回提示音 ＋ 取消尚未播報的語音
-//   登錄名次      → 賓果慶祝音 ＋ 語音 ＋ 紅包彩帶動畫
+//   登錄名次      → 賓果慶祝音 ＋ 紅包彩帶動畫
 import { getState, setState, subscribe } from '../core/state.js';
 import * as sound from '../audio/sound.js';
-import * as tts from '../audio/tts.js';
-import { phraseForRecord, phraseForRank } from '../audio/tts.js';
 import { el, toast } from '../utils/dom.js';
 
 const CONFETTI_COUNT = 36;
@@ -51,10 +49,9 @@ export function prefersReducedMotion() {
   }
 }
 
-export function initEffects({ soundBtn, ttsBtn }) {
+export function initEffects({ soundBtn }) {
   // 不支援的功能直接隱藏開關，不報錯
   if (!sound.isSupported()) soundBtn.hidden = true;
-  if (!tts.isSupported()) ttsBtn.hidden = true;
 
   // ---- 開關按鈕 ----
   function paintToggle(btn, name, on) {
@@ -82,30 +79,13 @@ export function initEffects({ soundBtn, ttsBtn }) {
     setState({ ui: { soundOn: want } });
   });
 
-  ttsBtn.addEventListener('click', () => {
-    const want = !getState().ui.ttsOn;
-    if (want) {
-      if (!tts.setEnabled(true)) {
-        toast('這個瀏覽器不支援語音播報', 'error');
-        return;
-      }
-      tts.speak('語音播報已開啟'); // 同一次手勢內發聲，同時解鎖 Safari
-    } else {
-      tts.setEnabled(false);
-    }
-    setState({ ui: { ttsOn: want } });
-  });
-
   // ---- 依 state 變化觸發 ----
   let prev = snapshot(getState());
-  let lastBatchId = null; // 連抽的每一筆共用 batchId：同一批連續播報，不同批（新操作）則先清掉舊語音
 
   function onState(state) {
     paintToggle(soundBtn, '音效', state.ui.soundOn);
-    paintToggle(ttsBtn, '語音', state.ui.ttsOn);
     // state 與引擎不同步時（例如重新載入）以 state 為準
     if (!state.ui.soundOn && sound.isEnabled()) sound.setEnabled(false);
-    if (!state.ui.ttsOn && tts.isEnabled()) tts.setEnabled(false);
 
     const events = diffEvents(prev, snapshot(state));
     prev = snapshot(state);
@@ -116,28 +96,20 @@ export function initEffects({ soundBtn, ttsBtn }) {
     switch (e.type) {
       case 'draw': {
         const kind = e.record.type;
-        if (!e.record.batchId || e.record.batchId !== lastBatchId) tts.cancel(); // 新操作：取消仍在排隊的舊語音
-        lastBatchId = e.record.batchId;
         sound.play('roll');
         sound.play(kind, { delay: ROLL_SECONDS });
-        tts.speak(phraseForRecord(e.record));
         break;
       }
       case 'undo':
-        lastBatchId = null;
-        tts.cancel(); // 撤回：取消尚未播報的語音
         sound.play('undo');
         break;
       case 'reset':
-        lastBatchId = null;
-        tts.cancel();
         break;
       case 'rankRetract':
         sound.play('undo');
         break;
       case 'rank':
         sound.play('bingo');
-        tts.speak(phraseForRank(e.rank));
         celebrate(e.rank, e.tieCount);
         break;
     }

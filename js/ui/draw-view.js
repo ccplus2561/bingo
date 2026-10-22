@@ -1,4 +1,4 @@
-// 抽號卡：大號碼＋連抽（1～5 次，結果以懸浮視窗顯示）／撤回／名次登錄／結束遊戲＋最新 5 次走馬燈。
+// 抽號卡：大號碼＋連抽（1～5 次；1 次直接顯示，2 次以上以懸浮視窗顯示）／撤回／名次登錄／結束遊戲＋最新 5 次走馬燈。
 // DOM 只建立一次，之後由 state.subscribe 驅動更新（按鈕不會被重建，鍵盤焦點與遙控器操作不中斷）。
 import { getState, setState, subscribe } from '../core/state.js';
 import { drawOne, drawnNumbers, appendRecords } from '../core/draw-engine.js';
@@ -8,6 +8,7 @@ import { NUMBER_MAX, FINANCE, BATCH_PLAY_INTERVAL_MS } from '../config/defaults.
 import { el, toast, confirmDialog, showModal } from '../utils/dom.js';
 import { bingoLetter, formatMoney } from '../utils/format.js';
 import { createCheckPanel } from './check-view.js';
+import { endGameFlow } from './receipt-view.js';
 
 const KIND = {
   none: { caption: '尚未抽號', tag: '' },
@@ -73,7 +74,7 @@ export function initDrawView(root) {
   const batchBtn = el('button', { type: 'button', class: 'btn btn-gold btn-batch', onClick: onBatch }, batchLabel, batchSub);
 
   // ---- 其他操作 ----
-  const rankBtn = el('button', { type: 'button', class: 'btn btn-primary btn-tool', onClick: openRankDialog });
+  const rankBtn = el('button', { type: 'button', class: 'btn btn-primary btn-tool', onClick: onRankBtn });
 
   root.replaceChildren(
     el('div', { class: 'draw-panel' },
@@ -120,6 +121,14 @@ export function initDrawView(root) {
       toast(MESSAGES[result.code] ?? result.message, 'error');
       return;
     }
+    // 連抽 1 次：直接更新大號碼與最新 5 次，不開全螢幕視窗
+    if (result.requested === 1) {
+      apply({ ok: true, game: result.game });
+      stepper.set(1);
+      update();
+      return;
+    }
+
     busy = true;
     update();
 
@@ -163,6 +172,17 @@ export function initDrawView(root) {
     if (okBtn) { okBtn.disabled = false; okBtn.focus(); }
     if (result.drawn < result.requested) toast(`號碼已抽完，實際抽出 ${result.drawn} 次`);
     return modal;
+  }
+
+  /** 前三名全部登錄後，按鈕變為「結束遊戲」（需確認）；否則開啟名次登錄視窗 */
+  function onRankBtn() {
+    if (busy) return;
+    const { game } = getState();
+    if (game.status === 'playing' && coveredPositions(game.ranks) >= FINANCE.prizeRankCount) {
+      endGameFlow();
+      return;
+    }
+    openRankDialog();
   }
 
   function openRankDialog() {
@@ -267,8 +287,7 @@ export function initDrawView(root) {
 
     // 名次、結束
     const rankFull = coveredPositions(game.ranks) >= FINANCE.prizeRankCount;
-    rankBtn.textContent = rankFull ? '🎉 名次已登錄完' : `🎉 第 ${nextRank(state)} 名賓果`;
-    // 名次全滿時仍可開啟視窗（用來取消上一個名次登錄）；尚無名次又無法登錄時才禁用
+    rankBtn.textContent = rankFull && playing ? '🏁 結束遊戲' : rankFull ? '🎉 名次已登錄完' : `🎉 第 ${nextRank(state)} 名賓果`;
     rankBtn.disabled = !playing || busy || (game.ranks.length === 0 && !canDeclareRank(state));
     const ended = game.status === 'ended';
 

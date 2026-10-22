@@ -493,7 +493,6 @@
 .rules-overlay .rules-sec { margin-bottom: 20px; }
 .rules-overlay .rules-note { font-size: inherit; }
 .rules-overlay .modal-actions .btn { min-height: 60px; font-size: 1.4rem; }
-.rules-read { position: sticky; top: 0; z-index: 2; min-height: 56px; margin-bottom: 14px; padding: 0 22px; font-size: 1.3rem; border-color: var(--gold-500); }
 
 /* 名次／結束：抽號卡右上方 */
 .draw-topbar { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }

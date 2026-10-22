@@ -1,6 +1,5 @@
 // ❓ 規則說明（彈窗）。內容為純文字說明，不含任何金額調整機制的細節。
 import { el, showModal } from '../utils/dom.js';
-import { speak, cancel, isSupported } from '../audio/tts.js';
 
 const SECTIONS = [
   ['號碼範圍', ['本局使用 1～75 號。']],
@@ -17,7 +16,7 @@ const SECTIONS = [
   ]],
   ['連抽', [
     '抽號統一使用「連抽」：選擇 1～5 次後按下連抽，付費金額列入彩池。單次付費上限 = 單抽單價 × 5。',
-    '連抽結果會以懸浮視窗一次顯示本次所有抽出內容；每次連抽結束後次數會恢復為 1。',
+    '連抽 2 次以上時，結果會以懸浮視窗一次顯示本次所有抽出內容；連抽 1 次則直接顯示在大號碼與「最新 5 次」。每次連抽結束後次數會恢復為 1。',
   ]],
   ['快速查驗號碼', ['到「驗卡」輸入單一數字，或用點號分隔多個數字（如 5.12.33.68），即可查詢號碼是否已被抽中。']],
   ['同時賓果', ['若同一輪抽號有多人同時賓果，依現場規定平分該名次與後續名次的獎金，下一個名次順延。']],
@@ -29,28 +28,11 @@ export function openRules() {
     ...SECTIONS.map(([title, paras]) =>
       el('section', { class: 'rules-sec' }, el('h4', { class: 'rules-h' }, title), ...paras.map((p) => el('p', {}, p)))),
     el('p', { class: 'rules-note' }, '主持人保留依現場情況調整抽號機率與結算比例之權利。'));
-  const readText = [...SECTIONS.flatMap(([t, ps]) => [t, ...ps]), '主持人保留依現場情況調整抽號機率與結算比例之權利。'];
-  let timer = null;
-  const stopTimer = () => { if (timer) { clearInterval(timer); timer = null; } };
-  const readBtn = el('button', { type: 'button', class: 'btn btn-secondary rules-read' }, '🔊 朗讀規則');
-  const setIdle = () => { readBtn.textContent = '🔊 朗讀規則'; stopTimer(); };
-  readBtn.addEventListener('click', () => {
-    if (!isSupported()) { readBtn.textContent = '此瀏覽器不支援朗讀'; return; }
-    if (timer) { cancel(); setIdle(); return; }
-    cancel();
-    readText.forEach((t) => speak(t, { force: true }));
-    readBtn.textContent = '⏹ 停止朗讀';
-    timer = setInterval(() => {
-      const s = globalThis.speechSynthesis;
-      if (s && !s.speaking && !s.pending) setIdle();
-    }, 600);
-  });
   showModal({
     title: '❓ 規則說明',
-    content: el('div', { class: 'rules-wrap' }, readBtn, body),
+    content: el('div', { class: 'rules-wrap' }, body),
     wide: true,
     actions: [{ text: '關閉', kind: 'primary' }],
-    onClose: () => { cancel(); stopTimer(); },
   });
   const overlay = [...document.querySelectorAll('.modal-overlay')].at(-1);
   overlay?.classList.add('rules-overlay');

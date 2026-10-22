@@ -144,9 +144,9 @@ export function sanitize(raw, defaults = createDefaultState()) {
     (r) => r && [1, 2, 3].includes(r.rank) && Number.isInteger(r.tieCount) && Number.isInteger(r.atSeq)
   );
 
-  // 聲音與語音每次載入一律預設關閉（瀏覽器也需使用者操作才能解鎖播放）
+  // 音效每次載入一律預設關閉（瀏覽器也需使用者操作才能解鎖播放）
   ui.soundOn = false;
-  ui.ttsOn = false;
+  delete ui.ttsOn; // 舊存檔殘留欄位
 
   return { settings, game, ui };
 }

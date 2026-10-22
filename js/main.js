@@ -23,7 +23,7 @@ function start() {
   initTickerView(document.getElementById('ticker-root'));
   initBoardView(document.getElementById('board-root'));
   initSettings(document.getElementById('settings-root'));
-  initEffects({ soundBtn: document.getElementById('sound-btn'), ttsBtn: document.getElementById('tts-btn') });
+  initEffects({ soundBtn: document.getElementById('sound-btn') });
 
   document.querySelectorAll('.desk-slot').forEach((slot) => slot.replaceChildren(createDeskBrand({ back: !!slot.closest('[data-panel="settings"]') })));
   initRulesView(document.getElementById('rules-btn'));
