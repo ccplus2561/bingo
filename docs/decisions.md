@@ -19,9 +19,9 @@
 | S1-2 | 單抽單價上限 | 單抽單價 × 連抽上限(10) ≤ 單次付費上限(100)，即單抽最高 10 元、最低 1 元。 |
 | S1-3 | 獎金比例不合 100 | 不儲存、顯示紅字提示；提供「自動換算為 100」按鈕（等比例換算，餘數補第 1 名）。 |
 | S1-4 | 開始遊戲條件 | 參加總人數至少 1 人；開始前跳出確認視窗（說明將鎖定）。 |
-| S1-5 | 重新開始 | 以確認彈窗二次確認；清除 localStorage 並回到預設 setup。 |
+| S1-5 | 重新開始 | 以確認彈窗二次確認；回到預設 setup。 |
 | S1-6 | 數值上限 | 人數、張數 ≤ 999；價格、安慰獎 ≤ 9999；辛苦費 0~100%，皆需為非負整數。 |
-| S1-7 | 聲音狀態 | `soundOn` 不論存檔內容，每次載入一律為 false。 |
+| S1-7 | 聲音狀態 | `soundOn` 每次載入一律為 false（資料不保存）。 |
 | S1-8 | package.json | 除 test script 外加上 `"type": "module"`，讓 Node 測試能直接使用 ES Modules（無任何依賴）。 |
 | S1-9 | 佔位畫面階段編號 | 抽號卡＝階段 2、驗卡＝階段 3、獎金池＝階段 4。 |
 | S1-10 | test 指令 | Node 22 不接受目錄參數（`node --test tests/` 會 MODULE_NOT_FOUND），改用 `node --test`，會自動執行 `tests/` 內所有 `*.test.js`。 |
@@ -98,7 +98,5 @@
 | S7-7 | 列印 | `@media print` 只留收據、隱藏按鈕與其他版面，A4 單頁。 |
 | S7-8 | 規則說明入口 | 頂部「❓ 規則」按鈕開彈窗（任何階段皆可開）；內容不描述防虧本的背景調整機制，僅保留 F 節第 8 項聲明句。 |
 | S7-9 | 窄螢幕標題列 | ≤430px 時按鈕列移到標題下方（兩列），避免新增按鈕後橫向溢出。 |
-| S7-10 | 部署流程 | `pages.yml`：先 `npm test`，通過後只複製 `index.html`、`404.html`、`css/`、`js/`、`assets/` 到 `_site` 再部署（不公開 tests、docs 等）。 |
 | S7-11 | 404.html | 以 meta refresh＋腳本導回專案首頁（專案網址 `/<儲存庫>/` 與使用者站台都可）。 |
-| S7-12 | console | 程式中沒有 `console.log`；僅保留存檔／音效失敗時的 `console.warn / error`（屬實際錯誤回報）。 |
-| S7-13 | release 版 | `python make_zip.py release` 產生純靜態版：不含 `tests/`、`docs/QA-checklist.md`、`.github/`、`package.json`、`make_zip.py`。 |
+| S7-12 | console | 程式中沒有 `console.log`；僅保留音效失敗時的 `console.warn / error`（屬實際錯誤回報）。 |

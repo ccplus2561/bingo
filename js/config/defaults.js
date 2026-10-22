@@ -1,7 +1,5 @@
 // 預設值與常數（單一來源）。其他模組一律由此匯入，不要在別處寫死數字。
 
-export const STORAGE_KEY = 'bingo-board-v1';
-
 // 號碼範圍
 export const NUMBER_MIN = 1;
 export const NUMBER_MAX = 75;
@@ -28,16 +26,6 @@ export const BOARD_COLUMNS = [
   { letter: 'O', min: 61, max: 75 },
 ];
 
-// 底部分頁
-export const TAB_LIST = [
-  { id: 'draw', icon: '🎲', label: '抽號卡' },
-  { id: 'check', icon: '🔍', label: '驗卡' },
-  { id: 'prize', icon: '🏆', label: '獎金池' },
-  { id: 'settings', icon: '⚙️', label: '設定' },
-];
-
-export const GAME_STATUS = ['setup', 'playing', 'ended'];
-export const LAYOUTS = ['mobile', 'desktop']; // 只提供手機版／電腦版（無自動）
 
 // 抽號暗控參數（單一來源，可自行調整）
 export const DRAW_RULES = {

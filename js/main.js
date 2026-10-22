@@ -1,5 +1,5 @@
-// 啟動入口：讀檔、版面切換、建立分頁，並載入各視圖
-import { load, getState, setState, subscribe } from './core/state.js';
+// 啟動入口：建立分頁並載入各視圖
+import { getState, setState, subscribe } from './core/state.js';
 import { initTabs } from './ui/tabs.js';
 import { initSettings } from './ui/settings-view.js';
 import { initDrawView } from './ui/draw-view.js';
@@ -15,7 +15,8 @@ import { createDeskBrand } from './ui/more-menu.js';
 const STATUS_TEXT = { setup: '設定中', playing: '遊戲進行中', ended: '已結束' };
 
 function start() {
-  load();
+  // 資料不保存：順手清掉舊版本留在瀏覽器裡的存檔
+  try { localStorage.removeItem('bingo-board-v1'); } catch { /* 忽略 */ }
   setState({ ui: { layout: 'desktop' } });
   initTabs(document.querySelectorAll('[data-panel]'));
   initPrizeView(document.getElementById('pool-root'));
@@ -52,7 +53,7 @@ function start() {
       badge.textContent = STATUS_TEXT[status] ?? status;
       badge.dataset.status = status;
     });
-    receiptBtn.hidden = status !== 'ended'; // 結束後才顯示「🧾 收據」，重新整理後仍可再開
+    receiptBtn.hidden = status !== 'ended'; // 結束後才顯示「🧾 收據」
   };
   updateBadge();
   subscribe(updateBadge);

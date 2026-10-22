@@ -4,7 +4,7 @@ import { getState, subscribe } from '../core/state.js';
 export function initTabs(panels) {
   function apply() {
     let active = getState().ui.tab;
-    if (active !== 'settings') active = 'draw'; // 舊存檔的 check / prize 一律回抽號
+    if (active !== 'settings') active = 'draw'; // 只有抽號與設定兩個畫面
     panels.forEach((p) => { p.hidden = p.dataset.panel !== active; });
     window.scrollTo(0, 0);
   }

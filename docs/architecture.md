@@ -3,12 +3,11 @@
 ## 資料流
 ```
 使用者操作 → ui/*-view.js → core/state.js 的 setState(patch)
-                              ├─ 自動 save()（localStorage：bingo-board-v1）
                               └─ 通知 subscribe() 的訂閱者 → UI 局部更新
 ```
 - `core/` 為純邏輯、無 DOM，可在 Node 測試（`node --test`）。
 - `ui/` 負責畫面；只透過 `getState / setState / subscribe` 與 core 溝通。
-- 儲存體可用 `setStorage()` 注入（測試用 in-memory）。
+- 狀態只存在記憶體，不寫入 localStorage；關閉或重新整理網頁即回到初始狀態。
 
 ## state 結構（階段 1 定案，欄位名稱不得任意更改）
 ```js
@@ -21,7 +20,7 @@ state = {
 }
 ```
 - `setState(patch)`：patch 為 `{settings?, game?, ui?}`，各區塊淺層合併；陣列欄位整個取代。
-- `load()`：逐欄位檢查型別，錯誤欄位以預設值取代；`soundOn` 每次載入一律為 false。
+- `reset()`：回到預設的 setup 狀態。
 
 ## 模組（階段 1 狀態）
 | 模組 | 狀態 |
@@ -71,7 +70,7 @@ state = {
  按鈕（抽號卡）──► draw-view.run()
                      ├─ drawOne(getState(), {paid:false})   ┐ core：純函式，回傳
                      └─ paidDraw(getState(), 1)             ┘ { ok, game } 或 { ok:false, code }
-                     └─ ok → setState({ game })  ─► save()（localStorage）＋ notify()
+                     └─ ok → setState({ game })  ─► notify()
                                                        │
         ┌──────────────────────┬───────────────────────┼────────────────────────┐
         ▼                      ▼                       ▼                        ▼

@@ -1,76 +1,69 @@
 # 🧧 兵果彩盤
 
-除夕家族聚會用的賓果彩盤。玩家使用紙卡，本網頁投屏到電視，顯示號碼、彩池與獎金。
-純前端（HTML / CSS / JavaScript ES Modules），不需打包、不需安裝依賴。**v1.0.0**
+家族聚會用的賓果抽獎網頁。玩家使用紙卡，主持人把本網頁投屏到電視，大家一起看號碼、名次與獎金。
+純前端（HTML / CSS / JavaScript ES Modules），不需安裝、不需打包。
 
-完整需求見 [`docs/planning.md`](docs/planning.md)，模組說明見 [`docs/architecture.md`](docs/architecture.md)，假設與決策見 [`docs/decisions.md`](docs/decisions.md)，手動驗收見 [`docs/QA-checklist.md`](docs/QA-checklist.md)。
+> 資料不會保存：關閉或重新整理網頁後，所有設定與抽獎紀錄都會清空，回到初始畫面。
+
+## 快速上手（主持人操作）
+
+1. **設定**：開啟網頁後按「⚙️ 前往設定並開始遊戲」（或「☰ 更多 → 設定」）。
+   - 預設會使用獎金功能：填入參加人數、新卡／續卡張數與單價、單抽單價、獎金比例、辛苦費 %、安慰獎金額。
+   - 只想單純抽號？把最上方的「啟用獎金功能」關掉，就不會有獎金池與任何費用。
+   - 想修改或補充規則文字，展開「規則內容」編輯。
+2. **開始抽獎**：按「🎰 開始抽獎」→ 確認 → 畫面會先全螢幕顯示規則給大家看 → 按「🎰 開始抽獎」正式開始。
+3. **抽號**：用 − ＋ 選擇 1～5 次，按「連抽」。連抽 1 次直接顯示在大圓球；2 次以上會用視窗逐筆顯示結果。
+4. **賓果登錄**：玩家喊賓果後，先用「☰ 更多 → 驗卡」核對號碼（輸入 `5` 或 `5.12.33.68`），再按右上角「🎉 第 N 名賓果」登錄；若多人同時賓果就填人數。
+5. **結束**：前三名都登錄後，該按鈕會變成「🏁 結束遊戲」（需確認）。結束後顯示結算收據（獎金關閉時顯示「本局結果」）；按「開新局」即可重新來過。
+
+### 畫面說明
+- **左**：獎金池（總彩池、前三名獎金、安慰獎）；獎金關閉時改為「抽獎進度」。
+- **中**：大圓球顯示最新號碼、連抽控制、「最新 5 次」。
+- **右**：1～75 號碼矩陣，已抽出的號碼會亮起。
+- **☰ 更多**：規則、驗卡、音效開關、設定、結束遊戲。
 
 ## 功能介紹
-- 🎲 抽號 1～75：免費抽、付費單抽（10 元）、連抽（單次上限 100 元 10 抽，逐筆播放）、撤回上一筆（付費抽號同步退回彩池）。
-- 📋 抽號類型：新號、重複號碼、銘謝惠顧（可於設定開關），連續無效最多 4 次。
-- 🎉 名次登錄：主持人按「第 N 名賓果」，可填同時賓果人數（平分該名次與後續名次獎金）。
-- 🔍 快速驗卡：輸入 `5` 或 `5.12.33.68` 查詢是否已抽中。
-- 🏆 獎金池：總彩池分項、前三名預估／實領、第 2 名出爐後顯示安慰獎。
-- 🧾 結算收據：結束遊戲後全螢幕收據（總收入、前三名實領、安慰獎、主持人辛苦費、零頭），可開新局。
-- ❓ 規則說明、🔊 音效（預設關閉）、電視三欄／手機 App 兩種版面、重新整理不遺失進度。
+- **抽號**：1～75 號；結果類型有新號、重複號碼（無效）、銘謝惠顧（無效），可在設定開關；連續無效最多 4 次。
+- **連抽**：一次 1～5 次，付費金額列入彩池。
+- **名次登錄**：前三名，支援同時賓果（平分該名次與後續名次的獎金）。
+- **驗卡**：快速查詢號碼是否已抽中，支援多個號碼。
+- **獎金池與結算**：自動計算總彩池、前三名與安慰獎、主持人辛苦費，結束後產生收據；可整個關閉。
+- **規則視窗**：內容可自訂，開始抽獎前先給所有人看。
+- **音效**：預設關閉，需手動開啟；賓果登錄時有紅包與彩帶慶祝動畫。
+- **電視友好**：大字、整頁不捲動、按鈕與切換皆有動畫（系統設為「減少動態」時自動關閉）。
 
-> 截圖放置位置：`docs/screenshots/`（自行加入後可在此引用，例如 `![抽號畫面](docs/screenshots/draw.png)`）。
-
-## 主持人操作指南
-1. **設定**：到「⚙️ 設定」填參加人數、新卡／續卡張數與價格、獎金比例、辛苦費 %、安慰獎金額，按「▶ 開始遊戲」（開局後部分欄位鎖定）。
-2. **抽號**：回到「🎲 抽號卡」按「抽號（免費）」；玩家想加碼可按「付費單抽」或「連抽」，彩池自動增加。按錯可「↩ 撤回上一個」。
-3. **賓果**：玩家喊賓果後先用「🔍 驗卡」核對號碼，再按「🎉 第 N 名賓果」登錄（多人同時賓果就填人數）。
-4. **結算**：前三名產生後（或要提前收場時）按「🏁 結束遊戲」→ 確認 → 收據彈出。
-5. **開新局**：收據中按「🔄 開新局」（或設定頁「重新開始」）清除所有紀錄。
-
-## 本機預覽
-ES Modules 無法用 `file://` 開啟（直接雙擊 `index.html` 會空白），請啟動本機伺服器：
+## 本機執行
+ES Modules 不能用 `file://` 直接開啟，請用任一種本機伺服器：
 
 ```bash
 npx serve                      # 或
-python -m http.server 8000     # 然後開啟 http://localhost:8000
+python -m http.server 8000     # 再開 http://localhost:8000
 ```
 
-## 執行測試
-需要 Node.js 18 以上（建議 22），無需安裝任何套件：
-
-```bash
-npm test      # 等同 node --test，自動執行 tests/ 內所有 *.test.js（含整合測試）
+## 專案架構
 ```
-
-## 部署到 GitHub Pages（自動部署）
-1. 將本資料夾內容推上 GitHub 儲存庫的 `main` 分支（根目錄即為 `index.html`）。
-2. 儲存庫 **Settings → Pages → Build and deployment → Source** 選 **GitHub Actions**。
-3. 推送到 `main` 後，`.github/workflows/pages.yml` 會先執行 `npm test`，**測試通過才部署**。
-4. 到 **Actions** 分頁確認成功，網址為 `https://<帳號>.github.io/<儲存庫名>/`。
-
-只想直接上傳靜態檔案：使用 `bingo-board_release.zip`（不含測試與開發檔案），解壓後放到任何靜態空間即可。
-
-## 專案結構
-```
-index.html  404.html  package.json  make_zip.py  CHANGELOG.md
-css/        base / components / mobile / desktop
+index.html  404.html
+css/
+  base.css         色票、字級、reset
+  components.css   按鈕、表單、彈窗、抽號卡、規則視窗、動畫
+  layout.css       電視三欄版面、設定頁排版
 js/
-  main.js                 啟動入口
-  config/defaults.js      預設值與常數（單一來源）
-  core/                   純邏輯（無 DOM）：state、draw-engine、batch-draw、undo、checker、ranks、finance、receipt
-  ui/                     畫面：tabs、layout-switch、draw / board / check / prize / settings / receipt / rules、effects
-  audio/                  sound（Web Audio）
-  utils/                  dom、format
-tests/                    node:test 單元與整合測試
-docs/                     planning、architecture、decisions、QA-checklist
-.github/workflows/pages.yml
+  main.js          啟動入口
+  config/defaults.js   預設值與常數（單一來源）
+  core/            純邏輯（無 DOM）
+    state.js         全域狀態（只存在記憶體）
+    draw-engine.js   抽號引擎    batch-draw.js  連抽
+    ranks.js         名次與同時賓果    checker.js  驗卡解析
+    finance.js       彩池與獎金計算    receipt.js  結算收據
+  ui/              畫面
+    tabs.js  more-menu.js  draw-view.js  ticker-view.js  board-view.js
+    prize-view.js  settings-view.js  rules-view.js  check-view.js
+    receipt-view.js  effects.js（音效與慶祝動畫）
+  audio/sound.js   Web Audio 音效
+  utils/           dom.js（建立元素、彈窗）  format.js（金額格式）
+docs/              planning、architecture、decisions
 ```
-
-## 打包
-```bash
-python make_zip.py 7          # 完整專案 → bingo-board_stage7.zip
-python make_zip.py release    # 純靜態版 → bingo-board_release.zip
-```
-
-## 資料儲存
-對局進度只存在瀏覽器的 localStorage（key：`bingo-board-v1`），重新整理不會遺失；
-在「⚙️ 設定」按「🔄 重新開始」或收據的「🔄 開新局」會清除。
+資料流：畫面操作 → `core` 純函式計算 → `setState` → 各 `ui` 檢視訂閱並更新。
 
 ## 授權
 MIT License — 可自由使用、修改與分享；請自行確認當地法規，本工具僅供家族娛樂之用。
