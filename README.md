@@ -42,7 +42,7 @@ python -m http.server 8000     # 再開 http://localhost:8000
 
 ## 專案架構
 ```
-index.html  404.html
+index.html
 css/
   base.css         色票、字級、reset
   components.css   按鈕、表單、彈窗、抽號卡、規則視窗、動畫
