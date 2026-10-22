@@ -1,7 +1,7 @@
 # 🧧 兵果彩盤
 
-家族聚會用的賓果抽獎網頁。玩家使用紙卡，主持人把本網頁投屏到電視，大家一起看號碼、名次與獎金。
-純前端（HTML / CSS / JavaScript ES Modules），不需安裝、不需打包。
+賓果抽獎網頁。主持人把本網頁投屏到電視，大家一起看號碼、名次與獎金。
+純前端（HTML/CSS/JavaScript ES Modules），不需安裝、不需打包。
 
 > 資料不會保存：關閉或重新整理網頁後，所有設定與抽獎紀錄都會清空，回到初始畫面。遊戲進行中關閉或重新整理時，瀏覽器會先跳出確認提示。
 
@@ -32,14 +32,6 @@
 - **音效**：預設關閉，需手動開啟；賓果登錄時有紅包與彩帶慶祝動畫。
 - **電視友好**：大字、整頁不捲動、按鈕與切換皆有動畫（系統設為「減少動態」時自動關閉）。
 
-## 本機執行
-ES Modules 不能用 `file://` 直接開啟，請用任一種本機伺服器：
-
-```bash
-npx serve                      # 或
-python -m http.server 8000     # 再開 http://localhost:8000
-```
-
 ## 專案架構
 ```
 index.html
@@ -48,22 +40,27 @@ css/
   components.css   按鈕、表單、彈窗、抽號卡、規則視窗、動畫
   layout.css       電視三欄版面、設定頁排版
 js/
-  main.js          啟動入口
+  main.js              啟動入口
   config/defaults.js   預設值與常數（單一來源）
-  core/            純邏輯（無 DOM）
-    state.js         全域狀態（只存在記憶體）
-    draw-engine.js   抽號引擎    batch-draw.js  連抽
-    ranks.js         名次與同時賓果    checker.js  驗卡解析
-    finance.js       彩池與獎金計算    receipt.js  結算收據
-  ui/              畫面
-    tabs.js  more-menu.js  draw-view.js  ticker-view.js  board-view.js
-    prize-view.js  settings-view.js  rules-view.js  check-view.js
-    receipt-view.js  effects.js（音效與慶祝動畫）
+  core/                純邏輯（無 DOM）
+    state.js           全域狀態（只存在記憶體）
+    draw-engine.js     抽號引擎    batch-draw.js  連抽
+    ranks.js           名次與同時賓果    checker.js  驗卡解析
+    finance.js         彩池與獎金計算    receipt.js  結算收據
+  ui/                  畫面
+    tabs.js
+    more-menu.js
+    draw-view.js
+    ticker-view.js
+    board-view.js
+    prize-view.js
+    settings-view.js
+    rules-view.js
+    check-view.js
+    receipt-view.js
+    effects.js（音效與慶祝動畫）
   audio/sound.js   Web Audio 音效
   utils/           dom.js（建立元素、彈窗）  format.js（金額格式）
 docs/              planning、architecture、decisions
 ```
 資料流：畫面操作 → `core` 純函式計算 → `setState` → 各 `ui` 檢視訂閱並更新。
-
-## 授權
-MIT License — 可自由使用、修改與分享；請自行確認當地法規，本工具僅供家族娛樂之用。
