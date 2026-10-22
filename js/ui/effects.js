@@ -1,7 +1,7 @@
-// 氣氛層（階段 6）：頂部音效開關、依 state 變化播放音效與語音、賓果慶祝動畫。
+// 氣氛層（階段 6）：頂部音效開關、依 state 變化播放音效、賓果慶祝動畫。
 // 設計：只「訂閱」state 並比對前後差異，不介入 draw-view 的操作流程，也不修改 core。
 //   抽出新的一筆 → 滾動聲 ＋ 結果音效
-//   history 變短  → 撤回提示音 ＋ 取消尚未播報的語音
+//   history 變短  → 撤回提示音
 //   登錄名次      → 賓果慶祝音 ＋ 紅包彩帶動畫
 import { getState, setState, subscribe } from '../core/state.js';
 import * as sound from '../audio/sound.js';
@@ -102,8 +102,6 @@ export function initEffects({ soundBtn }) {
       }
       case 'undo':
         sound.play('undo');
-        break;
-      case 'reset':
         break;
       case 'rankRetract':
         sound.play('undo');

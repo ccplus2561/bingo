@@ -121,27 +121,10 @@
 
 /* 佔位畫面 */
 .placeholder { text-align: center; padding: 48px 16px; }
-.placeholder-icon { font-size: 3rem; line-height: 1.2; }
-.placeholder-title { font-family: var(--font-brand); font-size: var(--fs-xl); font-weight: 700; color: var(--red-700); }
-.placeholder-note { color: var(--muted); }
-
-/* 共用（獎金池分頁使用） */
-.draw-card { text-align: center; }
 .ball-caption { font-weight: 700; color: var(--muted); }
-.stat-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; margin-top: 10px; font-size: var(--fs-sm); font-weight: 600; }
-.btn-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
-.btn-row .btn { flex: 1; padding: 0 8px; font-size: var(--fs-md); }
-.batch-input { width: 80px; flex: none; text-align: center; }
-.batch-label { font-weight: 600; }
-.history-list { list-style: none; margin: 0; padding: 0; max-height: 40vh; overflow-y: auto; }
-.history-item { display: flex; align-items: center; gap: 10px; min-height: 40px; border-bottom: 1px dashed var(--line); }
-.history-seq { color: var(--muted); min-width: 3em; font-variant-numeric: tabular-nums; }
-.history-repeat strong, .history-blank strong { color: var(--muted); }
 
 /* 獎金池（階段 3 簡易版） */
 .pool-amount { font-family: var(--font-brand); font-size: 2.5rem; font-weight: 900; color: var(--red-700); line-height: 1.3; }
-.prize-row { display: flex; justify-content: space-between; align-items: center; min-height: 44px; border-bottom: 1px dashed var(--line); font-size: var(--fs-lg); }
-.prize-row:last-child { border-bottom: 0; }
 .sub-title { font-size: var(--fs-md); color: var(--muted); margin-top: 14px; }
 
 /* ===== 階段 4：抽號卡 ===== */
@@ -175,7 +158,6 @@
     border-width: calc(var(--d) * .028);
   }
 }
-.ball-letter { font-size: .3em; letter-spacing: .12em; color: var(--red-700); line-height: 1; margin-bottom: .04em; }
 .ball-num { line-height: .95; font-variant-numeric: tabular-nums; }
 .ball-word { font-size: .5em; line-height: 1.2; letter-spacing: .06em; text-align: center; }
 
@@ -186,7 +168,6 @@
   border-color: var(--teal-700); border-style: dashed; color: #124852;
   box-shadow: 0 6px 0 var(--teal-700), 0 0 24px rgba(42, 122, 134, .4);
 }
-.ball-xl[data-kind="repeat"] .ball-letter { color: var(--teal-700); }
 /* 銘謝惠顧：深褐色，不顯示號碼 */
 .ball-xl[data-kind="blank"] {
   background: radial-gradient(circle at 35% 30%, #86746b, var(--brown-700) 70%);
@@ -307,10 +288,7 @@
 .stepper button:disabled { opacity: .3; cursor: not-allowed; }
 .stepper-value { min-width: 2.2em; text-align: center; font-size: 1.5rem; font-weight: 900; font-variant-numeric: tabular-nums; }
 .btn-batch { flex-direction: column; gap: 0; line-height: 1.25; min-height: 56px; font-size: 1.15rem; padding: 4px 8px; }
-.draw-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.btn-tool { min-height: 52px; font-size: 1rem; padding: 0 8px; }
-
-.btn-check-modal { display: none; } /* 手機已有「驗卡」分頁；電腦版才在抽號頁提供彈窗 */
+.btn-tool { min-height: 52px; font-size: 1rem; padding: 0 8px; } /* 手機已有「驗卡」分頁；電腦版才在抽號頁提供彈窗 */
 
 .modal-body { margin: 8px 0 18px; }
 .modal-wide { max-width: 560px; }
@@ -332,16 +310,6 @@
 .check-row.is-hit { background: var(--gold-100); border-color: var(--gold-500); }
 .check-row.is-miss { color: var(--muted); }
 .check-row.is-invalid { background: #fdeaea; border-color: var(--red-500); color: var(--red-700); }
-
-/* ===== 階段 6：標題列開關、動畫、慶祝、載入狀態 ===== */
-.hdr-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
-  min-width: 44px; min-height: 40px; padding: 0 10px; border-radius: 999px; white-space: nowrap;
-  border: 2px solid var(--gold-500); background: transparent; color: var(--gold-100);
-  font-size: var(--fs-sm); font-weight: 700;
-}
-.hdr-btn:active { background: rgba(232, 169, 44, .25); }
-.hdr-btn[data-on="true"] { background: var(--gold-500); color: var(--red-900); }
 .hdr-icon { font-size: 1.1rem; line-height: 1; }
 
 /* 矩陣：已抽數量與最新一顆的閃爍 */
@@ -429,20 +397,6 @@
 
 .modal-wide .modal-body { max-height: 60vh; overflow-y: auto; }
 
-/* ===== 介面選擇（進站視窗＋設定頁）、連抽結果視窗 ===== */
-.layout-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
-.layout-opt {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  min-height: 92px; padding: 8px 4px; text-align: center;
-  background: #fff; color: var(--red-700); border: 2px solid var(--line); border-radius: var(--radius-md);
-  font-weight: 700;
-}
-.layout-opt-icon { font-size: 1.6rem; line-height: 1; }
-.layout-opt-text { font-size: var(--fs-md); font-weight: 900; }
-.layout-opt-desc { font-size: .72rem; font-weight: 600; color: var(--muted); line-height: 1.25; }
-.layout-opt:active { background: var(--gold-100); }
-.layout-opt.is-active { background: var(--gold-100); border-color: var(--red-700); box-shadow: 0 0 0 2px rgba(209, 42, 60, .18); }
-
 .modal-batch { position: relative; max-width: min(900px, 96vw); padding: 22px; }
 .batch-modal { display: flex; flex-direction: column; gap: 14px; }
 .batch-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
@@ -450,27 +404,7 @@
 .batch-results .chip-num { font-size: clamp(2.2rem, 6vw, 3.6rem); }
 .batch-results .chip-tag { font-size: 1.1rem; }
 .batch-summary { text-align: center; font-weight: 700; color: var(--red-900); font-size: 1.15rem; }
-.batch-fs {
-  position: absolute; top: 14px; right: 14px; min-height: 40px; padding: 0 14px; border-radius: 999px;
-  border: 2px solid var(--gold-500); background: #fff; color: var(--red-700); font-weight: 700; font-size: var(--fs-sm);
-}
 .modal-batch .modal-title { padding-right: 120px; }
-/* 全螢幕：鋪滿整個視窗，5 張結果大卡一字排開 */
-.batch-overlay.is-full { padding: 0; background: var(--paper); }
-.batch-overlay.is-full .modal-batch {
-  max-width: none; width: 100%; height: 100%; border: 0; border-radius: 0;
-  display: flex; flex-direction: column; padding: 24px clamp(16px, 4vw, 56px);
-}
-.batch-overlay.is-full .modal-body { flex: 1; display: flex; max-height: none; overflow: auto; margin: 12px 0; }
-.batch-overlay.is-full .batch-modal { flex: 1; justify-content: center; width: 100%; }
-.batch-overlay.is-full .batch-results { grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: clamp(8px, 1.6vw, 28px); }
-@media (max-width: 700px) { .batch-overlay.is-full .batch-results { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); } }
-.batch-overlay.is-full .batch-results .chip { min-height: clamp(140px, 32vh, 320px); }
-.batch-overlay.is-full .batch-results .chip-num { font-size: clamp(2.2rem, 6.4vw, 6.5rem); }
-.batch-overlay.is-full .batch-results .chip-tag { font-size: clamp(1.1rem, 2vw, 2rem); }
-.batch-overlay.is-full .batch-summary { font-size: clamp(1.2rem, 2.4vw, 2.2rem); }
-.batch-overlay.is-full .modal-title { font-size: clamp(1.6rem, 3vw, 2.6rem); }
-.batch-overlay.is-full .modal-actions .btn { min-height: 64px; font-size: 1.4rem; }
 .ticker-card {
   background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg);
   padding: 12px 16px; margin-bottom: 14px;
@@ -481,8 +415,6 @@
 .draw-topbar { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 .draw-topbar .btn-tool { min-height: 44px; padding: 0 14px; }
 html[data-layout="desktop"] .draw-topbar .btn-tool { min-height: clamp(36px, 5vh, 48px); padding: 0 14px; font-size: clamp(.85rem, 1.9vh, 1.05rem); }
-.draw-tools { grid-template-columns: 1fr; }
-html[data-layout="desktop"] .draw-tools { grid-template-columns: 1fr; }
 
 /* 連抽結果視窗預設就大：近全螢幕、n 張一字排開、大字 */
 .modal-batch { width: 98vw; max-width: 98vw; min-height: 80vh; display: flex; flex-direction: column; }
@@ -560,7 +492,7 @@ html[data-layout="desktop"] .draw-tools { grid-template-columns: 1fr; }
 [data-panel]:not([hidden]) { animation: panel-in .32s cubic-bezier(.2,.8,.2,1) both; }
 
 /* 按鈕：懸停上浮、按下回彈、金色按鈕掃光 */
-.btn, .layout-opt, .switch-row, .board-cell, .stepper button {
+.btn, .switch-row, .board-cell, .stepper button {
   transition: transform .16s cubic-bezier(.2,.9,.3,1.3), box-shadow .18s ease, background-color .18s ease, border-color .18s ease, filter .18s ease, opacity .18s ease;
 }
 .btn { position: relative; overflow: hidden; }

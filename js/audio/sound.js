@@ -67,7 +67,6 @@ export const SOUND_DEFS = {
   },
 };
 
-export const SOUND_NAMES = Object.keys(SOUND_DEFS);
 
 const MASTER_GAIN = 0.6;
 const MAX_ACTIVE_NODES = 80; // 安全上限：極端情況下直接略過，避免節點堆積

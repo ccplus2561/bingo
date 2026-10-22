@@ -3,7 +3,6 @@
 import { getState, subscribe } from '../core/state.js';
 import { parseNumbers, checkNumbers } from '../core/checker.js';
 import { el } from '../utils/dom.js';
-import { bingoLetter } from '../utils/format.js';
 
 export function createCheckPanel() {
   const input = el('input', {
@@ -60,9 +59,4 @@ export function createCheckPanel() {
   const unsubscribe = subscribe(render); // 抽號／撤回後結果即時更新
   render();
   return { node, focus: () => input.focus(), destroy: unsubscribe };
-}
-
-export function initCheckView(root) {
-  const panel = createCheckPanel();
-  root.replaceChildren(el('div', { class: 'card' }, el('h2', { class: 'card-title' }, '🔍 驗卡'), panel.node));
 }

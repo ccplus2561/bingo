@@ -36,11 +36,6 @@ export function calcConsolationUnit(settings) {
   return Math.min(configured, cap);
 }
 
-/** 預估安慰獎總額 = 有效未得名人數 × 當期安慰獎單價 */
-export function calcEstimatedConsolation(settings, winners = FINANCE.prizeRankCount) {
-  return calcUnrankedPlayers(settings, winners) * calcConsolationUnit(settings);
-}
-
 /** 以指定辛苦費 % 與安慰獎單價試算一次（內部使用） */
 function evaluate(state, hostPercent, consolationUnit) {
   const { settings } = state;

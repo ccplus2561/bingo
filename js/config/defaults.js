@@ -13,9 +13,6 @@ export const LIMITS = {
   maxPrice: 9999,
 };
 
-// 版面：>= 此寬度（px）時「自動」模式採電腦三欄
-export const LAYOUT_BREAKPOINT = 1024;
-
 // 連抽依序播放，每筆結果的間隔（毫秒）
 export const BATCH_PLAY_INTERVAL_MS = 800;
 

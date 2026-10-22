@@ -25,6 +25,7 @@ export function openReceipt() {
   const state = getState();
   if (state.game.status !== 'ended') return;
   closeReceipt();
+  document.querySelector('.celebrate')?.remove(); // 結束時若慶祝動畫還在播，先清掉避免蓋住收據
   const plain = !state.settings.prizeEnabled;
   const r = buildReceipt(state);
   const when = dateText();

@@ -27,7 +27,6 @@ export function initPrizeView(root) {
   /** 獎金關閉：只顯示名次與抽號進度，沒有任何金額 */
   function renderPlain(state) {
     const { game } = state;
-    const byRank = new Map(game.ranks.map((r) => [r.rank, r]));
     const rows = [];
     let pos = 1;
     for (const r of game.ranks) {

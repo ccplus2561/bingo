@@ -12,7 +12,7 @@
 - 🔍 快速驗卡：輸入 `5` 或 `5.12.33.68` 查詢是否已抽中。
 - 🏆 獎金池：總彩池分項、前三名預估／實領、第 2 名出爐後顯示安慰獎。
 - 🧾 結算收據：結束遊戲後全螢幕收據（總收入、前三名實領、安慰獎、主持人辛苦費、零頭），可開新局。
-- ❓ 規則說明、🔊 音效與語音播報（預設關閉）、電視三欄／手機 App 兩種版面、重新整理不遺失進度。
+- ❓ 規則說明、🔊 音效（預設關閉）、電視三欄／手機 App 兩種版面、重新整理不遺失進度。
 
 > 截圖放置位置：`docs/screenshots/`（自行加入後可在此引用，例如 `![抽號畫面](docs/screenshots/draw.png)`）。
 
@@ -55,7 +55,7 @@ js/
   config/defaults.js      預設值與常數（單一來源）
   core/                   純邏輯（無 DOM）：state、draw-engine、batch-draw、undo、checker、ranks、finance、receipt
   ui/                     畫面：tabs、layout-switch、draw / board / check / prize / settings / receipt / rules、effects
-  audio/                  sound（Web Audio）、tts（語音）
+  audio/                  sound（Web Audio）
   utils/                  dom、format
 tests/                    node:test 單元與整合測試
 docs/                     planning、architecture、decisions、QA-checklist

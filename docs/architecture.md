@@ -17,11 +17,11 @@ state = {
               drawPrice, maxBatchDraws, maxBatchAmount, prizeRatio:[50,30,20],
               consolationAmount, allowRepeat, allowBlank, hostFeePercent, locked },
   game:     { status:'setup'|'playing'|'ended', history:[], paidDrawCount, invalidStreak, ranks:[] },
-  ui:       { layout:'auto', soundOn:false, ttsOn:false, tab:'draw' }
+  ui:       { layout:'auto', soundOn:false, tab:'draw' }
 }
 ```
 - `setState(patch)`：patch 為 `{settings?, game?, ui?}`，各區塊淺層合併；陣列欄位整個取代。
-- `load()`：逐欄位檢查型別，錯誤欄位以預設值取代；`soundOn / ttsOn` 每次載入一律為 false。
+- `load()`：逐欄位檢查型別，錯誤欄位以預設值取代；`soundOn` 每次載入一律為 false。
 
 ## 模組（階段 1 狀態）
 | 模組 | 狀態 |
@@ -34,7 +34,7 @@ state = {
 | `ui/check-view.js`、`ui/prize-view.js` | ✅ 階段 5 完成 |
 | `core/finance`、`core/ranks` | ✅ 階段 3 完成 |
 | `core/receipt`、`ui/receipt-view`、`ui/rules-view` | ✅ 階段 7 完成 |
-| `audio/sound.js`、`audio/tts.js`、`ui/effects.js` | ✅ 階段 6 完成 |
+| `audio/sound.js`、`ui/effects.js` | ✅ 階段 6 完成 |
 
 ## 設定驗證
 `ui/settings-view.js` 匯出純函式 `validateNumberField / validateRatio / normalizeRatio`，供測試與後續階段使用。
@@ -98,18 +98,15 @@ state = {
 - `utils/dom.js` 的 `showModal({title, content, actions, wide, onClose})` 為通用彈窗（名次登錄、驗卡、結算佔位）；`confirmDialog` 維持原樣。
 - 遊戲中不顯示辛苦費與零頭：UI 只讀取 `settle()` 的 `prizes`、`consolationUnitUsed`、`unrankedPlayers`，不讀 `hostFee`／`remainder`／`adjustments`。
 
-## 階段 6：音效、語音、動畫（audio 模組）
+## 階段 6：音效、動畫（audio 模組）
 ```
- 頂部 🔊 音效／🔊 語音 開關 ─► effects.js 的 click 處理（同一次手勢內解鎖）
+ 頂部 🔊 音效 開關 ─► effects.js 的 click 處理（同一次手勢內解鎖）
                                   ├─ sound.setEnabled(true) → 建立 AudioContext ＋ resume()
-                                  └─ tts.setEnabled(true)   → 播報「語音播報已開啟」
-                                  └─ setState({ ui: { soundOn / ttsOn } })
+                                  └─ setState({ ui: { soundOn } })
 
  state 變化 ─► effects.onState ─► diffEvents(前, 後)（純函式）
                                   ├─ draw        → sound 'roll' ＋ 結果音（new／repeat／blank）＋ tts 播報
-                                  ├─ undo        → tts.cancel() ＋ sound 'undo'
-                                  ├─ reset       → tts.cancel()
-                                  ├─ rank        → sound 'bingo' ＋ tts「第N名賓果」＋ celebrate()（紅包彩帶）
+                                  ├─ rank        → sound 'bingo'＋ celebrate()（紅包彩帶）
                                   └─ rankRetract → sound 'undo'
 ```
 - **UI 不介入 core**：`effects.js` 只訂閱 state、比對前後差異；`core/` 與階段 4~5 的操作流程零修改（`draw-view.js` 僅新增「前往設定」空狀態按鈕）。
@@ -117,8 +114,6 @@ state = {
   - AudioContext **只在使用者點擊開啟時才建立**（載入頁面零接觸，因此不會有瀏覽器自動播放警告），並在同一手勢內呼叫 `resume()`、播放一個靜音緩衝（iOS Safari）。
   - 結果音以 `AudioContext` 時間排程（`delay`），不使用計時器，關閉或撤回後不會有殘留。
   - 每個音符的 oscillator／gain 於 `onended` 時 `disconnect()` 釋放；同時存活節點上限 80，超過直接略過。
-- **`audio/tts.js`**：`createTts({ getSynth })` 工廠；`speak(text)` 進佇列依序播報、`cancel()` 清空、`setEnabled(bool)`、`isSupported()`（每次呼叫即時偵測，執行期刪除 `speechSynthesis` 也安全）。語言 `zh-TW`，優先選 zh-TW 語音。純函式 `numberToZh`、`phraseForRecord`（「B，十二號」「重複號碼」「銘謝惠顧」）、`phraseForRank`（「第一名賓果」）。
-- **取消語音的時機**：撤回、重新開始、以及「新操作」（連抽的每一筆共用 `batchId`，`batchId` 不同或為 null 即視為新操作）。連抽期間不會互相取消，因此 10 抽會依序播完。
 - **`ui/effects.js` 的 `celebrate(rank, tieCount)`**：全螢幕橫幅＋ 36 片彩帶＋ 8 個 🧧，純 CSS（只動 `transform`／`opacity`），約 4.2 秒後自動移除；`prefers-reduced-motion` 時不建立彩帶與紅包，只顯示靜態橫幅 2.2 秒。
 - **載入狀態**：`index.html` 的 `#boot` 於 `main.js` 啟動完成後隱藏；6 秒仍未啟動則提示「載入失敗，請用 http 伺服器開啟」。
 

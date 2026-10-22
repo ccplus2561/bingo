@@ -1,12 +1,12 @@
 // 抽號卡：大號碼＋連抽（1～5 次；1 次直接顯示，2 次以上以懸浮視窗顯示）／撤回／名次登錄／結束遊戲＋最新 5 次走馬燈。
 // DOM 只建立一次，之後由 state.subscribe 驅動更新（按鈕不會被重建，鍵盤焦點與遙控器操作不中斷）。
 import { getState, setState, subscribe } from '../core/state.js';
-import { drawOne, drawnNumbers, appendRecords } from '../core/draw-engine.js';
+import { drawnNumbers, appendRecords } from '../core/draw-engine.js';
 import { paidDraw, maxBatchCount, maxBatchAmount } from '../core/batch-draw.js';
 import { canDeclareRank, declareRank, nextRank, retractLastRank, coveredPositions } from '../core/ranks.js';
 import { NUMBER_MAX, FINANCE, BATCH_PLAY_INTERVAL_MS } from '../config/defaults.js';
 import { el, toast, confirmDialog, showModal } from '../utils/dom.js';
-import { bingoLetter, formatMoney } from '../utils/format.js';
+import { formatMoney } from '../utils/format.js';
 import { createCheckPanel } from './check-view.js';
 import { endGameFlow } from './receipt-view.js';
 

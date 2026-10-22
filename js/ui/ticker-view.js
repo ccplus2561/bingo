@@ -3,7 +3,6 @@
 import { getState, subscribe } from '../core/state.js';
 import { TICKER_SIZE } from '../config/defaults.js';
 import { el } from '../utils/dom.js';
-import { bingoLetter } from '../utils/format.js';
 
 const TAG = { new: '新號', repeat: '重複', blank: '銘謝惠顧' };
 
