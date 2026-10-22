@@ -1,44 +1,42 @@
-// ❓ 規則說明（彈窗）。內容為純文字說明，不含任何金額調整機制的細節。
+// ❓ 規則說明（全螢幕卡片式）。內容來自 settings.rules（可在設定頁編輯）。
+// openRules({ onStart })：開始抽獎前先顯示規則，按「開始抽獎」才執行 onStart。
 import { el, showModal } from '../utils/dom.js';
+import { getState } from '../core/state.js';
 
-const SECTIONS = [
-  ['號碼範圍', ['本局使用 1～75 號。']],
-  ['獎金機制', [
-    '設有前三名獎金與安慰獎。總彩池 = 新卡收入 + 續卡收入 + 付費抽號收入。',
-    '前三名依設定比例分配獎金；未得名的玩家每人可領安慰獎。',
-    '玩家使用紙卡，賓果時由主持人在畫面登錄名次；第 2 名出爐後會顯示安慰獎資訊。',
-  ]],
-  ['抽號類型', [
-    '新號：尚未出現過的號碼，正常有效。',
-    '重複號碼：已經抽過的號碼，無效（需開啟「允許重複數字」才會出現）。',
-    '銘謝惠顧：沒有號碼，無效（需開啟「允許銘謝惠顧」才會出現）。',
-    '連續最多 4 次無效，第 5 次必定是新號碼。',
-  ]],
-  ['連抽', [
-    '抽號統一使用「連抽」：選擇 1～5 次後按下連抽，付費金額列入彩池。單次付費上限 = 單抽單價 × 5。',
-    '連抽 2 次以上時，結果會以懸浮視窗一次顯示本次所有抽出內容；連抽 1 次則直接顯示在大號碼與「最新 5 次」。每次連抽結束後次數會恢復為 1。',
-  ]],
-  ['快速查驗號碼', ['到「驗卡」輸入單一數字，或用點號分隔多個數字（如 5.12.33.68），即可查詢號碼是否已被抽中。']],
-  ['同時賓果', ['若同一輪抽號有多人同時賓果，依現場規定平分該名次與後續名次的獎金，下一個名次順延。']],
-  ['結算', ['主持人按「結束遊戲」後會產生本局結算收據，列出總收入、前三名實領、安慰獎、主持人辛苦費與零頭。']],
-];
+/** 一段規則 → 卡片（編號徽章＋標題＋逐行說明） */
+function ruleCard(rule, index) {
+  const lines = String(rule.body).split('\n').map((l) => l.trim()).filter(Boolean);
+  const card = el('section', { class: 'rule-card' },
+    el('div', { class: 'rule-head' },
+      el('span', { class: 'rule-no', 'aria-hidden': 'true' }, String(index + 1)),
+      el('h4', { class: 'rule-title' }, rule.title || '（未命名）')),
+    el('ul', { class: 'rule-lines' }, ...lines.map((l) => el('li', {}, l))));
+  card.style.setProperty('--i', String(index));
+  return card;
+}
 
-export function openRules() {
-  const body = el('div', { class: 'rules' },
-    ...SECTIONS.map(([title, paras]) =>
-      el('section', { class: 'rules-sec' }, el('h4', { class: 'rules-h' }, title), ...paras.map((p) => el('p', {}, p)))),
-    el('p', { class: 'rules-note' }, '主持人保留依現場情況調整抽號機率與結算比例之權利。'));
-  showModal({
-    title: '❓ 規則說明',
-    content: el('div', { class: 'rules-wrap' }, body),
-    wide: true,
-    actions: [{ text: '關閉', kind: 'primary' }],
-  });
+export function openRules({ onStart } = {}) {
+  const { rules, rulesNote } = getState().settings;
+  const starting = typeof onStart === 'function';
+  const content = el('div', { class: 'rules-wrap' },
+    el('header', { class: 'rules-hero' },
+      el('span', { class: 'rules-hero-icon', 'aria-hidden': 'true' }, '🧧'),
+      el('div', {},
+        el('h2', { class: 'rules-hero-title' }, '遊戲規則'),
+        el('p', { class: 'rules-hero-sub' }, starting ? '請所有玩家詳閱，確認後即開始抽獎' : '兵果彩盤・賓果抽獎'))),
+    el('div', { class: 'rules-grid' }, ...rules.map(ruleCard)),
+    rulesNote ? el('p', { class: 'rules-note' }, rulesNote) : null);
+
+  const actions = starting
+    ? [{ text: '← 返回設定', kind: 'secondary' }, { text: '🎰 開始抽獎', kind: 'primary', onClick: () => { onStart(); } }]
+    : [{ text: '關閉', kind: 'primary' }];
+  const modal = showModal({ title: '規則說明', content, wide: true, actions });
   const overlay = [...document.querySelectorAll('.modal-overlay')].at(-1);
   overlay?.classList.add('rules-overlay');
+  return modal;
 }
 
 /** 綁定頂部「❓」按鈕 */
 export function initRulesView(button) {
-  button.addEventListener('click', openRules);
+  button.addEventListener('click', () => openRules());
 }

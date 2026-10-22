@@ -103,6 +103,15 @@ body { overflow: hidden; display: flex; flex-direction: column; }
 .prize-fold[open] .prize-sum-hint { visibility: hidden; }
 .prize-fold[open] .prize-sum { padding-bottom: 0; }
 .prize-body { display: grid; grid-template-columns: 1.4fr 1fr 1fr; column-gap: 20px; padding: 0 18px 16px; align-items: start; }
-/* 4：開始遊戲　5：重新開始 */
-#settings-root > :nth-child(4), #settings-root > :nth-child(5) { align-self: start; }
-#settings-root > :nth-child(4) .btn, #settings-root > :nth-child(5) .btn { min-height: 56px; }
+/* 規則內容編輯（預設收合，橫跨整列） */
+.rules-edit-body { padding: 8px 18px 16px; }
+.rules-edit-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.rule-edit { display: flex; flex-direction: column; gap: 6px; padding: 10px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); }
+.rule-edit-head { display: flex; align-items: center; gap: 6px; }
+.rule-edit-head .input { flex: 1; min-width: 0; font-weight: 700; }
+.rule-ico { min-width: 40px; padding: 0 8px; }
+.rule-textarea { font-size: var(--fs-md); line-height: 1.5; resize: vertical; font-variant-numeric: normal; }
+.rules-edit-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+/* 開始抽獎／重新開始 */
+#settings-root > .card-action, #settings-root > .card-note { align-self: start; }
+#settings-root > .card-action .btn { min-height: 56px; }

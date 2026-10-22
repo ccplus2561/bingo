@@ -131,6 +131,11 @@ export function sanitize(raw, defaults = createDefaultState()) {
     ratio[0] + ratio[1] + ratio[2] === 100;
   if (!ratioOk) settings.prizeRatio = [...defaults.settings.prizeRatio];
 
+  settings.rules = settings.rules
+    .filter((r) => r && typeof r.title === 'string' && typeof r.body === 'string')
+    .map((r) => ({ title: r.title, body: r.body }));
+  if (src.settings && !Array.isArray(src.settings.rules)) settings.rules = defaults.settings.rules.map((r) => ({ ...r }));
+
   settings.maxBatchDraws = defaults.settings.maxBatchDraws; // 連抽上限非使用者設定，舊存檔一併套用新上限
   if (!GAME_STATUS.includes(game.status)) game.status = defaults.game.status;
   if (!LAYOUTS.includes(ui.layout)) ui.layout = defaults.ui.layout;

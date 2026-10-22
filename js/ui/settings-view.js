@@ -1,6 +1,7 @@
 // ⚙️ 設定頁：欄位驗證、開始遊戲（鎖定）、重新開始
 import { getState, setState, reset, subscribe } from '../core/state.js';
-import { DEFAULT_SETTINGS, LIMITS } from '../config/defaults.js';
+import { DEFAULT_SETTINGS, DEFAULT_RULES, DEFAULT_RULES_NOTE, LIMITS } from '../config/defaults.js';
+import { openRules } from './rules-view.js';
 import { el, toast, confirmDialog } from '../utils/dom.js';
 import { formatMoney } from '../utils/format.js';
 
@@ -68,7 +69,7 @@ export function normalizeRatio(values) {
 // ---------- 可編輯規則 ----------
 
 // 遊戲進行中，僅開放「加買卡」與「人數」；辛苦費 % 與安慰獎金額開局後一律鎖定
-const EDITABLE_WHILE_PLAYING = ['players', 'newCardCount', 'renewCardCount'];
+const EDITABLE_WHILE_PLAYING = ['players', 'newCardCount', 'renewCardCount', 'rules'];
 
 function isEditable(key, status) {
   if (status === 'setup') return true;
@@ -208,6 +209,54 @@ export function initSettings(root) {
     );
   }
 
+  // 規則內容編輯器：每段標題＋說明（每行一條），可上下移動、刪除、新增、還原預設
+  function rulesEditor(status) {
+    const editable = isEditable('rules', status);
+    let list = getState().settings.rules.map((r) => ({ ...r }));
+    let note = getState().settings.rulesNote;
+    const holder = el('div', { class: 'rules-edit-list' });
+    const commit = () => setState({ settings: { rules: list.map((r) => ({ ...r })), rulesNote: note } });
+
+    function paint() {
+      holder.replaceChildren(...list.map((r, i) => {
+        const title = el('input', { class: 'input', value: r.title, disabled: !editable, 'aria-label': `第 ${i + 1} 段標題`, placeholder: '標題',
+          onChange: () => { r.title = title.value.trim(); commit(); } });
+        const body = el('textarea', { class: 'input rule-textarea', rows: 3, disabled: !editable, 'aria-label': `第 ${i + 1} 段內容`, placeholder: '每一行為一條說明',
+          onChange: () => { r.body = body.value; commit(); } });
+        body.value = r.body;
+        const move = (d) => { const j = i + d; if (j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; commit(); paint(); };
+        return el('div', { class: 'rule-edit' },
+          el('div', { class: 'rule-edit-head' },
+            el('span', { class: 'rule-no', 'aria-hidden': 'true' }, String(i + 1)),
+            title,
+            el('button', { type: 'button', class: 'btn btn-small btn-secondary rule-ico', disabled: !editable || i === 0, 'aria-label': '上移', onClick: () => move(-1) }, '↑'),
+            el('button', { type: 'button', class: 'btn btn-small btn-secondary rule-ico', disabled: !editable || i === list.length - 1, 'aria-label': '下移', onClick: () => move(1) }, '↓'),
+            el('button', { type: 'button', class: 'btn btn-small btn-danger-outline rule-ico', disabled: !editable, 'aria-label': '刪除此段', onClick: () => { list.splice(i, 1); commit(); paint(); } }, '✕')),
+          body);
+      }));
+    }
+    paint();
+
+    const noteInput = el('input', { class: 'input', value: note, disabled: !editable, placeholder: '底部備註（可留空）', 'aria-label': '規則底部備註',
+      onChange: () => { note = noteInput.value.trim(); commit(); } });
+
+    return el('details', { class: 'card prize-fold rules-fold' },
+      el('summary', { class: 'prize-sum' },
+        el('span', { class: 'card-title' }, '規則內容'),
+        el('span', { class: 'prize-sum-hint' }, '開始抽獎前會先向所有人顯示（點擊展開編輯）')),
+      el('div', { class: 'rules-edit-body' },
+        holder,
+        el('div', { class: 'field' }, el('span', { class: 'field-label' }, '底部備註', lockTag(editable)), noteInput),
+        el('div', { class: 'rules-edit-actions' },
+          el('button', { type: 'button', class: 'btn btn-small btn-secondary', disabled: !editable, onClick: () => { list.push({ title: '新規則', body: '' }); commit(); paint(); holder.lastElementChild?.querySelector('input')?.select(); } }, '＋ 新增段落'),
+          el('button', { type: 'button', class: 'btn btn-small btn-secondary', onClick: () => openRules() }, '👁 預覽'),
+          el('button', { type: 'button', class: 'btn btn-small btn-danger-outline', disabled: !editable, onClick: async () => {
+            const ok = await confirmDialog({ title: '還原預設規則？', message: '目前編輯的規則內容將被預設內容取代。', confirmText: '還原', danger: true });
+            if (!ok) return;
+            list = DEFAULT_RULES.map((r) => ({ ...r })); note = DEFAULT_RULES_NOTE; noteInput.value = note; commit(); paint();
+          } }, '還原預設'))));
+  }
+
   async function onStart() {
     const { settings } = getState();
     if (settings.players < 1) {
@@ -217,13 +266,17 @@ export function initSettings(root) {
       return;
     }
     const ok = await confirmDialog({
-      title: '開始遊戲？',
-      message: '開始後，主持人辛苦費 % 與安慰獎金額將鎖定，無法修改。',
-      confirmText: '▶ 開始遊戲',
+      title: '開始抽獎？',
+      message: '接著會先顯示規則給所有人確認；開始後，主持人辛苦費 % 與安慰獎金額將鎖定，無法修改。',
+      confirmText: '下一步：顯示規則',
     });
     if (!ok) return;
-    setState({ settings: { locked: true }, game: { status: 'playing' }, ui: { tab: 'draw' } });
-    toast('遊戲開始！');
+    openRules({
+      onStart: () => {
+        setState({ settings: { locked: true }, game: { status: 'playing' }, ui: { tab: 'draw' } });
+        toast('開始抽獎！');
+      },
+    });
   }
 
   async function onReset() {
@@ -250,8 +303,8 @@ export function initSettings(root) {
         ? el(
             'div',
             { class: 'card card-action' },
-            el('button', { type: 'button', class: 'btn btn-primary btn-block', onClick: onStart }, '▶ 開始遊戲'),
-            el('p', { class: 'field-hint' }, '開始後，辛苦費 % 與安慰獎金額將鎖定。')
+            el('button', { type: 'button', class: 'btn btn-primary btn-block', onClick: onStart }, '🎰 開始抽獎'),
+            el('p', { class: 'field-hint' }, '先顯示規則，開始後辛苦費 % 與安慰獎金額將鎖定。')
           )
         : el(
             'div',
@@ -302,6 +355,7 @@ export function initSettings(root) {
           numberField('consolationAmount', '安慰獎金額（每人，元）', status),
           numberField('hostFeePercent', '主持人辛苦費（%）', status))
       ),
+      rulesEditor(status),
       startCard,
       el(
         'div',

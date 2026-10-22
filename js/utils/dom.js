@@ -34,13 +34,19 @@ export function toast(message, type = 'info') {
   setTimeout(() => item.remove(), 2800);
 }
 
+/** 彈窗關閉：先播淡出動畫再移除 */
+function dismiss(overlay) {
+  overlay.classList.add('is-closing');
+  setTimeout(() => overlay.remove(), 180);
+}
+
 /** 確認彈窗，回傳 Promise<boolean> */
 export function confirmDialog({ title, message, confirmText = '確定', cancelText = '取消', danger = false }) {
   return new Promise((resolve) => {
     const previous = document.activeElement;
     const close = (result) => {
       document.removeEventListener('keydown', onKey);
-      overlay.remove();
+      dismiss(overlay);
       if (previous && previous.focus) previous.focus();
       resolve(result);
     };
@@ -77,7 +83,7 @@ export function showModal({ title, content, actions = [], wide = false, onClose 
     if (closed) return;
     closed = true;
     document.removeEventListener('keydown', onKey);
-    overlay.remove();
+    dismiss(overlay);
     if (previous && previous.focus) previous.focus();
     if (onClose) onClose();
   };
