@@ -133,7 +133,8 @@ export function sanitize(raw, defaults = createDefaultState()) {
 
   settings.rules = settings.rules
     .filter((r) => r && typeof r.title === 'string' && typeof r.body === 'string')
-    .map((r) => ({ title: r.title, body: r.body }));
+    .filter((r) => !(r.title === '快速查驗號碼' && r.body.startsWith('到「驗卡」輸入單一數字'))) // 舊預設段落移除
+    .map((r) => (r.money ? { title: r.title, body: r.body, money: true } : { title: r.title, body: r.body }));
   if (src.settings && !Array.isArray(src.settings.rules)) settings.rules = defaults.settings.rules.map((r) => ({ ...r }));
 
   settings.maxBatchDraws = defaults.settings.maxBatchDraws; // 連抽上限非使用者設定，舊存檔一併套用新上限

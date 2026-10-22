@@ -134,6 +134,7 @@ export function initDrawView(root) {
 
     const total = result.records.length;
     const price = getState().settings.drawPrice;
+    const prizeOn = getState().settings.prizeEnabled;
     const grid = el('div', { class: 'batch-results', role: 'list', 'aria-label': '本次連抽結果' },
       ...Array.from({ length: total }, () => el('div', { class: 'chip is-empty', role: 'listitem' })));
     grid.style.setProperty('--n', String(total));
@@ -165,7 +166,7 @@ export function initDrawView(root) {
 
     const shownRecords = result.records.slice(0, shown);
     const count = (type) => shownRecords.filter((r) => r.type === type).length;
-    const parts = [`共 ${shown} 次・${formatMoney(shown * price)}`, `新號 ${count('new')}`];
+    const parts = [prizeOn ? `共 ${shown} 次・${formatMoney(shown * price)}` : `共 ${shown} 次`, `新號 ${count('new')}`];
     if (count('repeat')) parts.push(`重複 ${count('repeat')}`);
     if (count('blank')) parts.push(`銘謝惠顧 ${count('blank')}`);
     summary.textContent = parts.join('・');
@@ -190,7 +191,7 @@ export function initDrawView(root) {
     const state = getState();
     const rank = nextRank(state);
     const canDeclare = canDeclareRank(state);
-    const maxTie = Math.max(1, state.settings.players);
+    const maxTie = state.settings.prizeEnabled ? Math.max(1, state.settings.players) : 99;
     const tie = createStepper({ min: 1, max: maxTie, value: 1, label: '同時賓果人數', onChange: () => refreshNote() });
     const note = el('p', { class: 'field-hint' });
     const refreshNote = () => {
@@ -281,7 +282,7 @@ export function initDrawView(root) {
     const amount = n * settings.drawPrice;
     const overLimit = n > settings.maxBatchDraws;
     batchLabel.textContent = `🎰 連抽 ${n} 次`;
-    batchSub.textContent = `${formatMoney(amount)}（上限為 ${formatMoney(maxBatchAmount(settings))}）`;
+    batchSub.textContent = settings.prizeEnabled ? `${formatMoney(amount)}（上限為 ${formatMoney(maxBatchAmount(settings))}）` : `一次最多 ${maxCount} 次`;
     batchBtn.disabled = !canDraw || overLimit;
     if (busy || !playing) stepper.setDisabled(true);
 

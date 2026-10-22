@@ -16,7 +16,8 @@ function ruleCard(rule, index) {
 }
 
 export function openRules({ onStart } = {}) {
-  const { rules, rulesNote } = getState().settings;
+  const { rules: allRules, rulesNote, prizeEnabled } = getState().settings;
+  const rules = allRules.filter((r) => prizeEnabled || !r.money);
   const starting = typeof onStart === 'function';
   const content = el('div', { class: 'rules-wrap' },
     el('header', { class: 'rules-hero' },

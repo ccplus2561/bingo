@@ -8,6 +8,7 @@ const clamp01 = (n) => Math.min(1, Math.max(0, n));
 
 /** 預設壓力值：由 finance 的 calcPressure 提供（無 state 時退回常數） */
 export function defaultPressure(state) {
+  if (state && state.settings.prizeEnabled === false) return 0; // 獎金關閉：沒有金錢壓力
   return state ? calcPressure(state) : DRAW_RULES.defaultPressure;
 }
 

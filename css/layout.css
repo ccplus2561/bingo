@@ -91,9 +91,9 @@ body { overflow: hidden; display: flex; flex-direction: column; }
 #settings-root .field-hint { margin-top: 2px; }
 #settings-root .switch-row { padding: 8px 0; }
 /* 1：玩家與卡片（欄位兩欄排列）　2：抽號設定 */
-#settings-root > :nth-child(1) { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; align-content: start; }
-#settings-root > :nth-child(1) .card-title { grid-column: 1 / -1; }
-#settings-root > :nth-child(1) .field:first-of-type { grid-column: 1 / -1; }
+#settings-root > .card-players { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; align-content: start; }
+#settings-root > .card-players .card-title { grid-column: 1 / -1; }
+#settings-root > .card-players .field:first-of-type { grid-column: 1 / -1; }
 /* 3：獎金設定（預設收合，橫跨整列；展開後三欄並排） */
 #settings-root > .prize-fold { grid-column: 1 / -1; padding: 0; }
 .prize-sum { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; cursor: pointer; list-style: none; }
@@ -115,3 +115,10 @@ body { overflow: hidden; display: flex; flex-direction: column; }
 /* 開始抽獎／重新開始 */
 #settings-root > .card-action, #settings-root > .card-note { align-self: start; }
 #settings-root > .card-action .btn { min-height: 56px; }
+
+/* 獎金功能開關列（整列）與規則的「獎金相關」勾選 */
+#settings-root > .mode-card { grid-column: 1 / -1; padding: 6px 18px; }
+#settings-root > .mode-card .switch-row { margin-top: 0; }
+.rule-money { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-sm); color: var(--muted); font-weight: 600; cursor: pointer; }
+.rule-money input { width: 18px; height: 18px; accent-color: var(--red-700); }
+#settings-root.no-prize > .mode-card + .card { grid-column: 1 / -1; }

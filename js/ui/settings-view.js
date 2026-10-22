@@ -224,6 +224,9 @@ export function initSettings(root) {
         const body = el('textarea', { class: 'input rule-textarea', rows: 3, disabled: !editable, 'aria-label': `第 ${i + 1} 段內容`, placeholder: '每一行為一條說明',
           onChange: () => { r.body = body.value; commit(); } });
         body.value = r.body;
+        const money = el('label', { class: 'rule-money', title: '關閉獎金功能時隱藏這一段' },
+          el('input', { type: 'checkbox', checked: !!r.money, disabled: !editable, onChange: (e) => { if (e.target.checked) r.money = true; else delete r.money; commit(); } }),
+          '獎金相關');
         const move = (d) => { const j = i + d; if (j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; commit(); paint(); };
         return el('div', { class: 'rule-edit' },
           el('div', { class: 'rule-edit-head' },
@@ -232,7 +235,7 @@ export function initSettings(root) {
             el('button', { type: 'button', class: 'btn btn-small btn-secondary rule-ico', disabled: !editable || i === 0, 'aria-label': '上移', onClick: () => move(-1) }, '↑'),
             el('button', { type: 'button', class: 'btn btn-small btn-secondary rule-ico', disabled: !editable || i === list.length - 1, 'aria-label': '下移', onClick: () => move(1) }, '↓'),
             el('button', { type: 'button', class: 'btn btn-small btn-danger-outline rule-ico', disabled: !editable, 'aria-label': '刪除此段', onClick: () => { list.splice(i, 1); commit(); paint(); } }, '✕')),
-          body);
+          body, money);
       }));
     }
     paint();
@@ -259,7 +262,7 @@ export function initSettings(root) {
 
   async function onStart() {
     const { settings } = getState();
-    if (settings.players < 1) {
+    if (settings.prizeEnabled && settings.players < 1) {
       setError('players', '開始前請先填寫參加總人數（至少 1 人）');
       toast('請先填寫參加總人數', 'error');
       root.querySelector('#f-players')?.focus();
@@ -267,7 +270,7 @@ export function initSettings(root) {
     }
     const ok = await confirmDialog({
       title: '開始抽獎？',
-      message: '接著會先顯示規則給所有人確認；開始後，主持人辛苦費 % 與安慰獎金額將鎖定，無法修改。',
+      message: settings.prizeEnabled ? '接著會先顯示規則給所有人確認；開始後，主持人辛苦費 % 與安慰獎金額將鎖定，無法修改。' : '接著會先顯示規則給所有人確認；開始後將無法再切換獎金功能。',
       confirmText: '下一步：顯示規則',
     });
     if (!ok) return;
@@ -296,7 +299,8 @@ export function initSettings(root) {
   function render() {
     const { settings, game } = getState();
     const status = game.status;
-    signature = `${status}|${settings.locked}`;
+    signature = `${status}|${settings.locked}|${settings.prizeEnabled}`;
+    const prizeOn = settings.prizeEnabled;
 
     const startCard =
       status === 'setup'
@@ -304,7 +308,7 @@ export function initSettings(root) {
             'div',
             { class: 'card card-action' },
             el('button', { type: 'button', class: 'btn btn-primary btn-block', onClick: onStart }, '🎰 開始抽獎'),
-            el('p', { class: 'field-hint' }, '先顯示規則，開始後辛苦費 % 與安慰獎金額將鎖定。')
+            el('p', { class: 'field-hint' }, prizeOn ? '先顯示規則，開始後辛苦費 % 與安慰獎金額將鎖定。' : '先顯示規則，再開始抽獎。')
           )
         : el(
             'div',
@@ -319,22 +323,28 @@ export function initSettings(root) {
             )
           );
 
-    root.replaceChildren(
+    root.classList.toggle('no-prize', !prizeOn);
+    root.replaceChildren(...[
       el(
         'div',
-        { class: 'card' },
+        { class: 'card mode-card' },
+        toggleField('prizeEnabled', '啟用獎金功能', '關閉後沒有獎金池與費用，抽獎不受任何金錢限制，只記錄名次', status)
+      ),
+      prizeOn ? el(
+        'div',
+        { class: 'card card-players' },
         el('h2', { class: 'card-title' }, '玩家與卡片'),
         numberField('players', '參加總人數（持卡玩家數）', status, '安慰獎以人數計算，認人不認卡'),
         numberField('newCardPrice', '新卡單價（元）', status),
         numberField('renewCardPrice', '續卡單價（元）', status),
         numberField('newCardCount', '新卡張數', status),
         numberField('renewCardCount', '續卡張數', status)
-      ),
+      ) : null,
       el(
         'div',
         { class: 'card' },
         el('h2', { class: 'card-title' }, '抽號設定'),
-        numberField(
+        !prizeOn ? null : numberField(
           'drawPrice',
           '單抽單價（元）',
           status,
@@ -344,7 +354,7 @@ export function initSettings(root) {
         toggleField('allowBlank', '允許銘謝惠顧', '可能抽到無號碼的空籤', status)
       ),
       // 預設收合：避免他人看到保底（安慰獎）金額；每次重繪都回到收合
-      el(
+      !prizeOn ? null : el(
         'details',
         { class: 'card prize-fold' },
         el('summary', { class: 'prize-sum' },
@@ -362,12 +372,12 @@ export function initSettings(root) {
         { class: 'card-action' },
         el('button', { type: 'button', class: 'btn btn-danger-outline btn-block', onClick: onReset }, '🔄 重新開始')
       )
-    );
+    ].filter(Boolean));
   }
 
   render();
   // 只有開局狀態改變時才整頁重繪，避免輸入中失去焦點
   subscribe((s) => {
-    if (`${s.game.status}|${s.settings.locked}` !== signature) render();
+    if (`${s.game.status}|${s.settings.locked}|${s.settings.prizeEnabled}` !== signature) render();
   });
 }

@@ -25,6 +25,7 @@ export function openReceipt() {
   const state = getState();
   if (state.game.status !== 'ended') return;
   closeReceipt();
+  const plain = !state.settings.prizeEnabled;
   const r = buildReceipt(state);
   const when = dateText();
   const previous = document.activeElement;
@@ -55,9 +56,15 @@ export function openReceipt() {
   const overlay = el('div', { class: 'receipt-overlay', role: 'dialog', 'aria-modal': 'true', 'aria-label': '本局結算收據' },
     el('div', { class: 'receipt-scroll' },
       el('article', { class: 'receipt' },
-        el('h2', { class: 'rc-title' }, '🧧 本局結算收據'),
-        el('p', { class: 'rc-sub' }, `${when}｜參加 ${formatNumber(r.players)} 人｜抽號 ${formatNumber(r.drawCount)} 次`),
-
+        el('h2', { class: 'rc-title' }, plain ? '🧧 本局結果' : '🧧 本局結算收據'),
+        el('p', { class: 'rc-sub' }, plain ? `${when}｜抽號 ${formatNumber(r.drawCount)} 次` : `${when}｜參加 ${formatNumber(r.players)} 人｜抽號 ${formatNumber(r.drawCount)} 次`),
+        plain ? el('section', { class: 'rc-sec' },
+          el('h3', { class: 'rc-h' }, '名次'),
+          ...(state.game.ranks.length
+            ? state.game.ranks.map((k) => line(`🏆 第 ${k.rank} 名`, k.tieCount > 1 ? `同時 ${k.tieCount} 人` : '1 人', 'is-prize'))
+            : [line('名次', '無人登錄', 'is-none')]),
+          line('已抽出號碼', `${r.drawnCount} / 75`, 'is-sum')) : null,
+        ...(plain ? [] : [
         el('section', { class: 'rc-sec' },
           el('div', { class: 'rc-total' }, el('span', {}, '總收入'), el('strong', {}, formatMoney(r.totalPool))),
           line('新卡', formatMoney(r.pool.newCards)),
@@ -73,7 +80,7 @@ export function openReceipt() {
           el('h3', { class: 'rc-h' }, '其他'),
           line(`安慰獎（${formatNumber(r.consolation.people)} 人 × ${formatMoney(r.consolation.unit)}）`, formatMoney(r.consolation.total)),
           line('主持人辛苦費', formatMoney(r.hostFee)),
-          line('零頭', formatMoney(r.remainder))))),
+          line('零頭', formatMoney(r.remainder)))]))),
     el('div', { class: 'receipt-actions' },
       el('button', { type: 'button', class: 'btn btn-danger-outline', onClick: onNewGame }, '🔄 開新局'),
       el('button', { type: 'button', class: 'btn btn-primary', onClick: close }, '關閉收據')));
@@ -92,7 +99,7 @@ export function closeReceipt() {
 export async function endGameFlow() {
   const ok = await confirmDialog({
     title: '結束遊戲？',
-    message: '結束後將進入結算並產生收據，之後無法再抽號或撤回，確定要結束本局嗎？',
+    message: getState().settings.prizeEnabled ? '結束後將進入結算並產生收據，之後無法再抽號或撤回，確定要結束本局嗎？' : '結束後將顯示本局結果，之後無法再抽號或撤回，確定要結束本局嗎？',
     confirmText: '🏁 結束遊戲',
     danger: true,
   });

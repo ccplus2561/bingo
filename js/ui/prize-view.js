@@ -24,9 +24,32 @@ function slotRow(slot) {
 }
 
 export function initPrizeView(root) {
+  /** 獎金關閉：只顯示名次與抽號進度，沒有任何金額 */
+  function renderPlain(state) {
+    const { game } = state;
+    const byRank = new Map(game.ranks.map((r) => [r.rank, r]));
+    const rows = [];
+    let pos = 1;
+    for (const r of game.ranks) {
+      rows.push(row(`🎉 第 ${r.rank} 名已出爐`, r.tieCount > 1 ? `同時 ${r.tieCount} 人` : '已登錄', 'is-declared'));
+      pos = r.rank + r.tieCount;
+    }
+    for (; pos <= 3; pos++) rows.push(row(`第 ${pos} 名`, '尚未出爐'));
+    root.replaceChildren(
+      el('div', { class: 'card prize-card' },
+        el('h2', { class: 'card-title' }, '🎯 抽獎進度'),
+        el('div', { class: 'pool-main' },
+          el('p', { class: 'pool-label' }, '已抽出'),
+          el('p', { class: 'pool-amount pool-amount-xl', 'aria-live': 'polite' }, `${drawnNumbers(game.history).size} / ${NUMBER_MAX}`)),
+        el('h3', { class: 'sub-title' }, '名次'),
+        el('div', { class: 'pr-group' }, ...rows),
+        el('div', { class: 'pr-group pr-foot' }, row('抽號次數', `${formatNumber(game.history.length)} 次`))));
+  }
+
   function render() {
     const state = getState();
     const { settings, game } = state;
+    if (!settings.prizeEnabled) { renderPlain(state); return; }
     const pool = calcPoolBreakdown(state);
     const settlement = settle(state);
     const slots = rankSlots(state, settlement);
