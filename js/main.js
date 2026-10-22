@@ -58,6 +58,13 @@ function start() {
   updateBadge();
   subscribe(updateBadge);
 
+  // 遊戲進行中（資料不保存）：關閉或重新整理前跳出瀏覽器的確認提示，避免誤觸
+  window.addEventListener('beforeunload', (e) => {
+    if (getState().game.status !== 'playing') return;
+    e.preventDefault();
+    e.returnValue = ''; // 舊版瀏覽器需要
+  });
+
   // 載入完成：移除載入畫面
   const boot = document.getElementById('boot');
   if (boot) boot.hidden = true;
